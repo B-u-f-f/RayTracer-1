@@ -6,6 +6,36 @@
 
 #IncludeRegexTransform: 
 
+../include/camera.h
+stdbool.h
+-
+hypatiaINC.h
+../include/hypatiaINC.h
+
+../include/hitRecord.h
+stdbool.h
+-
+hypatiaINC.h
+../include/hypatiaINC.h
+
+../include/hypatiaINC.h
+hypatia.h
+../include/hypatia.h
+
+../include/outfile.h
+hypatiaINC.h
+../include/hypatiaINC.h
+
+../include/sphere.h
+hypatiaINC.h
+../include/hypatiaINC.h
+hitRecord.h
+../include/hitRecord.h
+
+../include/util.h
+hypatiaINC.h
+../include/hypatiaINC.h
+
 ../libs/include/hypatia.h
 math.h
 -
@@ -18,11 +48,33 @@ stdlib.h
 stdint.h
 -
 
-/home/lenovo/VTOP/pdc/project/pdc_project/src/main.c
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/main.c
 stdio.h
 -
 assert.h
 -
-hypatia.h
-/home/lenovo/VTOP/pdc/project/pdc_project/src/hypatia.h
+tgmath.h
+-
+stdbool.h
+-
+outfile.h
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/outfile.h
+util.h
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/util.h
+camera.h
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/camera.h
+sphere.h
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/sphere.h
+hitRecord.h
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/hitRecord.h
+hypatiaINC.h
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/hypatiaINC.h
+
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/util.c
+stdlib.h
+-
+stdbool.h
+-
+util.h
+/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/util.h
 
