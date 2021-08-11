@@ -1,4 +1,4 @@
-# Install script for directory: /home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer
+# Install script for directory: /home/lenovo/VTOP/pdc/project/pdc_project
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/lenovo/VTOP/pdc/project/pdc_project/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

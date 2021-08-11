@@ -48,7 +48,7 @@ stdlib.h
 stdint.h
 -
 
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/main.c
+/home/lenovo/VTOP/pdc/project/pdc_project/src/main.c
 stdio.h
 -
 assert.h
@@ -64,15 +64,15 @@ time.h
 float.h
 -
 outfile.h
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/outfile.h
+/home/lenovo/VTOP/pdc/project/pdc_project/src/outfile.h
 util.h
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/util.h
+/home/lenovo/VTOP/pdc/project/pdc_project/src/util.h
 camera.h
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/camera.h
+/home/lenovo/VTOP/pdc/project/pdc_project/src/camera.h
 sphere.h
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/sphere.h
+/home/lenovo/VTOP/pdc/project/pdc_project/src/sphere.h
 hitRecord.h
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/hitRecord.h
+/home/lenovo/VTOP/pdc/project/pdc_project/src/hitRecord.h
 hypatiaINC.h
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/hypatiaINC.h
+/home/lenovo/VTOP/pdc/project/pdc_project/src/hypatiaINC.h
 

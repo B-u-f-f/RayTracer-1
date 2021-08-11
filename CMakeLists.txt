@@ -7,5 +7,5 @@ file(GLOB_RECURSE SRC_FILES ./src/*.c)
 
 add_executable(pdc ${SRC_FILES})
 target_link_libraries(pdc m)
-target_compile_options(pdc PUBLIC -Wall -Werror -Wpedantic -Wextra)
+target_compile_options(pdc PUBLIC -Wall -Werror -Wpedantic -Wextra -g)
 target_include_directories(pdc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/include)

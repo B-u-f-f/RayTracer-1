@@ -13,6 +13,9 @@ Camera* createCamera(){
     c->viewport_height = 2.0;
     c->viewport_width = c->aspect_ratio*c->viewport_height;
     c->focal_length = 1.0;
+    
+    c->vertical.y = c->viewport_height;
+    c->horizontal.x = c->viewport_width;
 
     c->lower_left_corner.x = c->origin.x - c->horizontal.x/2 - c->vertical.x/2 - 0.0f;
     c->lower_left_corner.y = c->origin.y - c->horizontal.y/2 - c->vertical.y/2 - 0.0f;

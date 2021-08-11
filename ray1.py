@@ -39,8 +39,7 @@ class sphere:
         self.center = cen
         self.radius = r
  
-    def hit(self, o, d, t_min, t_max):
-        # 
+    def hit(self, o, d, t_min, t_max): 
         oc = o - self.center
         a = np.dot(d, d)
         half_b = np.dot(oc, d)       
@@ -67,7 +66,7 @@ class sphere:
 
 
 aspect_ratio = 16.0 / 9.0
-image_width = 400
+image_width = 100
 image_height = (int)(image_width/aspect_ratio)
 samples_per_pixel = 1
 max_depth = 10
@@ -144,14 +143,26 @@ spheres = [
 
 cam = camera()
 
-for j in tqdm(range(image_height-1, -1, -1)):
-    for i in range(0, image_width):
-        pixel_color = np.array([0, 0, 0], dtype = 'float64')
-        
-        for s in range(0, samples_per_pixel):
-            u = (float(i) + RNG.random() ) / (image_width - 1)
-            v = (float(j) + RNG.random() ) / (image_height - 1)
-            o, d = cam.get_ray(u, v)
-            pixel_color += ray_c(o, d, spheres, max_depth) 
-        
-        write_color(pixel_color, samples_per_pixel)
+o, d = cam.get_ray(0.00978263188, 0.605219483)
+
+print(o, d)
+
+h = spheres[1].hit(np.array([0, 0, 0]), np.array([0.48901854985386706, 0.27507293224334717, -1]), 0.01, np.inf)
+
+if(h != False):
+    print(h.p, h.normal, h.t, h.front_face)
+else:
+    print(h)
+
+
+#for j in tqdm(range(image_height-1, -1, -1)):
+#    for i in range(0, image_width):
+#        pixel_color = np.array([0, 0, 0], dtype = 'float64')
+#        
+#        for s in range(0, samples_per_pixel):
+#           u = (float(i) + RNG.random() ) / (image_width - 1)
+#            v = (float(j) + RNG.random() ) / (image_height - 1)
+#            o, d = cam.get_ray(u, v)
+#            pixel_color += ray_c(o, d, spheres, max_depth) 
+#        
+#        write_color(pixel_color, samples_per_pixel)
