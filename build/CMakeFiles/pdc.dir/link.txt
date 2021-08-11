@@ -1,0 +1,1 @@
+/usr/bin/cc    CMakeFiles/pdc.dir/src/main.c.o  -o pdc  -lm 

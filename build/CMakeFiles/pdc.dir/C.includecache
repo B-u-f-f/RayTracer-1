@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../libs/include/hypatia.h
+math.h
+-
+stdio.h
+-
+memory.h
+-
+stdlib.h
+-
+stdint.h
+-
+
+/home/lenovo/VTOP/pdc/project/pdc_project/src/main.c
+stdio.h
+-
+assert.h
+-
+hypatia.h
+/home/lenovo/VTOP/pdc/project/pdc_project/src/hypatia.h
+
