@@ -4,6 +4,9 @@
 #include <assert.h>
 #include <tgmath.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
+#include <float.h>
 
 #include "outfile.h"
 #include "util.h"
@@ -51,7 +54,7 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
 	if(depth <= 0)
 		return *(vector3_zero(&vertex));
 
-	HitRecord* rec = hittableList(n, sphere, origin, direction, 0.001, INFINITY);
+	HitRecord* rec = hittableList(n, sphere, origin, direction, 0.001, FLT_MAX);
 	if(rec != NULL){
 		vec3 target = rec->p;
 		vector3_add(&target, &rec->normal);
@@ -86,10 +89,13 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 
+	srand(time(NULL));
+
 	printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
-	const int HEIGHT = 256;
-	const int WIDTH = 256;
+	const float aspect_ratio = 16.0f / 9.0f;
+	const int WIDTH = 400;
+	const int HEIGHT = (int)(WIDTH/aspect_ratio);
 	const int SAMPLES_PER_PIXEL = 1;
 	const int MAX_DEPTH = 10;
 	
@@ -111,7 +117,7 @@ int main(int argc, char *argv[]){
 
 	for (int j = HEIGHT - 1; j >= 0; j--){
 		for (int i = 0; i < WIDTH; i++){
-			printf("%d %d \t", i, j);
+			printf("i %d j %d \t", i, j);
 
 			vector3_zero(&pixel_color);
 
@@ -130,9 +136,9 @@ int main(int argc, char *argv[]){
 
 	writeToPPM(argv[1], WIDTH, HEIGHT, image);
 	free(image);
-	free(c);
-	free(s[0]);
-	free(s[1]);
+	destroyCamera(c);
+	deleteSphere(s[0]);
+	deleteSphere(s[1]);
 
 	return 0;
 }

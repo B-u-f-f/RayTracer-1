@@ -57,6 +57,12 @@ tgmath.h
 -
 stdbool.h
 -
+stdlib.h
+-
+time.h
+-
+float.h
+-
 outfile.h
 /home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/outfile.h
 util.h
@@ -69,12 +75,4 @@ hitRecord.h
 /home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/hitRecord.h
 hypatiaINC.h
 /home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/hypatiaINC.h
-
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/util.c
-stdlib.h
--
-stdbool.h
--
-util.h
-/home/kaustubh/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/src/util.h
 
