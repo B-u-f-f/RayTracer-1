@@ -1,6 +1,9 @@
 #include <stdlib.h>
+
+#define HYPATIA_IMPLEMENTATION
+
 #include <check.h>
-#include "../include/util.h"
+#include "util.h"
 
 START_TEST(check_util_h_1){
     ck_assert_float_eq(clamp(8.9, 6.0, 8.0), 8.0);
@@ -24,7 +27,7 @@ Suite * clamp_suite(void)
 
     s = suite_create("Clamp");
 
-    /* Core test case */
+    //Core test case
     tc_core = tcase_create("Core");
 
     tcase_add_test(tc_core, check_util_h_1);
@@ -50,3 +53,5 @@ int main(void){
 
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
+

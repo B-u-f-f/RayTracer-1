@@ -3,13 +3,13 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(pdc VERSION 0.0)
-file(GLOB_RECURSE SRC_FILES ./src/*.c)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+conan_basic_setup(TARGETS)
 
+include_directories(libs/include)
 
-add_executable(pdc ${SRC_FILES})
-target_link_libraries(pdc m ${CONAN_LIBS})
-target_compile_options(pdc PUBLIC -Wall -Werror -Wpedantic -Wextra -g)
-target_include_directories(pdc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/include)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
+
+add_subdirectory(source)
+add_subdirectory(test)
