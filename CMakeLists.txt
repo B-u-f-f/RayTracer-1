@@ -7,9 +7,11 @@ project(pdc VERSION 0.0)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
+set(LIB_NAME ${CMAKE_PROJECT_NAME}lib)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/craytracer)
+
 include_directories(libs/include)
+add_subdirectory(craytracer)
 
-set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
-
-add_subdirectory(source)
-add_subdirectory(test)
+enable_testing()
+add_subdirectory(tests)
