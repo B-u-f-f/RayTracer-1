@@ -1,14 +1,19 @@
-set(BINARY ${CMAKE_PROJECT_NAME}tests)
+set(ROOT_BIN_NAME ${CMAKE_PROJECT_NAME})
 
 file(GLOB_RECURSE TEST_SRC_FILES ./*.c)
 
-set(SOURCES ${TEST_SRC_FILES})
 
-add_executable(${BINARY} util_test.c)
+foreach(TEST ${TEST_SRC_FILES})
+    get_filename_component(TEST_NAME ${TEST} NAME_WE)
+    set(BINARY ${ROOT_BIN_NAME}_${TEST_NAME})
 
-add_test(NAME ${BINARY} COMMAND ${BINARY})
+    add_executable(${BINARY} ${TEST})
 
-target_link_libraries(${BINARY} m ${LIB_NAME} CONAN_PKG::libcheck)
+    add_test(NAME ${BINARY} COMMAND ${BINARY})
 
-target_compile_options(${BINARY} PUBLIC -Wall -Werror -Wpedantic -Wextra -g)
-target_include_directories(${BINARY} PUBLIC ${SOURCE_DIR}/include)
+    target_link_libraries(${BINARY} m ${LIB_NAME} CONAN_PKG::libcheck)
+
+    target_compile_options(${BINARY} PUBLIC -Wall -Werror -Wpedantic -Wextra -g)
+    target_include_directories(${BINARY} PUBLIC ${SOURCE_DIR}/include)
+endforeach()
+

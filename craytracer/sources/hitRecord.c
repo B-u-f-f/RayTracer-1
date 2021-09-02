@@ -1,22 +1,22 @@
 #include "hitRecord.h"
 
-HitRecord* setRecord(float T, vec3 P, vec3 Normal, vec3 direction){
-    HitRecord* hit = (HitRecord*)malloc(sizeof(HitRecord));
-    hit->t = T;
-    hit->p = P;
-    float temp;
-    temp = vector3_dot_product(&direction, &Normal);
-    if(temp < 0) hit->front_face = true;
-    else hit->front_face = false;
+HitRecord hr_setRecord(cray_ld distanceFromOrigin, vec3 point, vec3 normal, vec3 direction){
+    // if temp < 0 then the ray has intersected the object at the front face
+    // otherwise it has intersected the object at the back face 
+    float temp = vector3_dot_product(&direction, &normal);
+    bool frontFace = (temp < 0) ? true : false;
 
-    hit->normal = Normal;
-
-    if(!hit->front_face) 
-        vector3_negate(&hit->normal);
-
-    return hit;
-}
-
-void deleteRecord(HitRecord* h){
-    free(h);
+    // Adjusting the normal so it always points away in the opposite direction 
+    // of the ray
+    if(!frontFace) {
+        vector3_negate(&normal);
+    }
+    
+    return (HitRecord){
+        .point = point,
+        .distanceFromOrigin = distanceFromOrigin,
+        .normal = normal,
+        .valid = true,
+        .frontFace = frontFace
+    };
 }

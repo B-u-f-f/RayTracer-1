@@ -29,20 +29,20 @@ vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
 
     vec3 temp;
     
-    vector3_setf3(&temp, 255.999f*clamp(r,0.0f,0.999f),
-                       255.999f*clamp(g,0.0f,0.999f),
-                        255.999f*clamp(b,0.0f,0.999f));
+    vector3_setf3(&temp, 255.999f*util_ldClamp(r,0.0,0.999),
+                       255.999f*util_ldClamp(g,0.0,0.999),
+                        255.999f*util_ldClamp(b,0.0,0.999));
 
     return temp;
 }
 
-HitRecord* hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, float t_min,float t_max){
-    HitRecord* h = NULL;
-    HitRecord* r = NULL;
+HitRecord hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, float t_min,float t_max){
+    HitRecord h;
+    HitRecord r;
     for(int i=0;i<n;i++){
         r = hit(*sphere[i], o, d, t_min, t_max);
 
-        if(r != NULL)
+        if(r.valid)
             h = r;
     }
     
@@ -54,15 +54,15 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
     if(depth <= 0)
         return *(vector3_zero(&vertex));
 
-    HitRecord* rec = hittableList(n, sphere, origin, direction, 0.001, FLT_MAX);
-    if(rec != NULL){
-        vec3 target = rec->p;
-        vector3_add(&target, &rec->normal);
-        vec3 rand = randomInUnitSphere();
+    HitRecord rec = hittableList(n, sphere, origin, direction, 0.001, FLT_MAX);
+    if(rec.valid){
+        vec3 target = rec.point;
+        vector3_add(&target, &rec.normal);
+        vec3 rand = util_randomInUnitSphere();
         vector3_add(&target, &rand);
         vec3 inter2 = target;
-        vector3_subtract(&inter2, &rec->p);
-        vec3 inter1 = ray_c(rec->p, inter2, n, sphere, depth - 1);
+        vector3_subtract(&inter2, &rec.point);
+        vec3 inter1 = ray_c(rec.point, inter2, n, sphere, depth - 1);
         vector3_multiplyf(&inter1, 0.5);
 
         return inter1;
@@ -119,12 +119,32 @@ int main(int argc, char *argv[]){
     
     vec3* image = (vec3*) malloc(sizeof(vec3) * HEIGHT * WIDTH);
     
+
     Sphere * s[2];
-    vec3 cen;
-    vector3_setf3(&cen, 0.0f, -100.5f, -1.0f);
-    s[0] = setSphere(cen, 100);
-    vector3_setf3(&cen, 0.0f, 0.0f, -1.0f);
-    s[1] = setSphere(cen, 0.5f);
+    
+    Sphere s1 = {
+        .center = {
+            .x = 0.0f, 
+            .y = -100.5f,
+            .z = -1.0f
+        },
+
+        .radius = 100
+    };
+    
+    Sphere s2 = {
+        .center = {
+            .x = 0.0f, 
+            .y = 0.0f,
+            .z = -1.0f
+        },
+
+        .radius = 0.5f
+    };
+
+
+    s[0] = &s1;
+    s[1] = &s2;
 
     Camera* c = createCamera();
     vec3 pixel_color;
@@ -140,8 +160,8 @@ int main(int argc, char *argv[]){
             vector3_zero(&pixel_color);
 
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
-                float u = ((float)i + randomFloat(0.0f, 1.0f)) / (WIDTH - 1);
-                float v = ((float)j + randomFloat(0.0f, 1.0f)) / (HEIGHT - 1);
+                float u = ((float)i + util_randomLD(0.0f, 1.0f)) / (WIDTH - 1);
+                float v = ((float)j + util_randomLD(0.0f, 1.0f)) / (HEIGHT - 1);
                 getRay(c, u, v, &o, &d);
                 temp = ray_c(o, d, 2, s, MAX_DEPTH);
                 vector3_add(&pixel_color, &temp);    
@@ -157,8 +177,6 @@ int main(int argc, char *argv[]){
     writeToPPM(argv[1], WIDTH, HEIGHT, image);
     free(image);
     destroyCamera(c);
-    deleteSphere(s[0]);
-    deleteSphere(s[1]);
 
     return 0;
 }

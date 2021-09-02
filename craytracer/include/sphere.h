@@ -4,16 +4,17 @@
 #include "hypatiaINC.h"
 #include "hitRecord.h"
 
-typedef struct sphere{
+#include "types.h"
+
+typedef struct {
+    // center of the sphere
     vec3 center;
-    float radius;
+
+    // radius of the sphere
+    cray_ld radius;
 } Sphere;
 
-Sphere* setSphere(vec3 cen, float r);
-
-HitRecord* hit(Sphere s, vec3 origin, vec3 direction, float t_min, float t_max);
-
-void deleteSphere(Sphere* s);
+HitRecord hit(Sphere s, vec3 origin, vec3 direction, cray_ld t_min, cray_ld t_max);
 
 #endif
 
