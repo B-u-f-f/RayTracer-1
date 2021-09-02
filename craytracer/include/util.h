@@ -2,12 +2,16 @@
 #define UTIL_H
 
 #include "hypatiaINC.h"
+#include "types.h"
 
-float clamp(float c, float lower, float upper);
-int randomRange(int lower, int upper);
-vec3 randomInUnitSphere();
+cray_ld util_ldClamp(cray_ld c, cray_ld lower, cray_ld upper);
 
-float randomFloat(float lower, float upper);
+// not in use
+// int randomRange(int lower, int upper);
+
+
+vec3 util_randomInUnitSphere();
+cray_ld util_randomLD(cray_ld lower, cray_ld upper);
 
 #endif
 
