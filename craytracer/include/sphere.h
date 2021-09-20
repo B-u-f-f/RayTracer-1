@@ -11,10 +11,10 @@ typedef struct {
     vec3 center;
 
     // radius of the sphere
-    cray_ld radius;
+    CFLOAT radius;
 } Sphere;
 
-HitRecord hit(Sphere s, vec3 origin, vec3 direction, cray_ld t_min, cray_ld t_max);
+HitRecord hit(Sphere s, vec3 origin, vec3 direction, CFLOAT t_min, CFLOAT t_max);
 
 #endif
 

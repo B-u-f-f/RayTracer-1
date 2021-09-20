@@ -4,14 +4,14 @@
 #include "hypatiaINC.h"
 #include "types.h"
 
-cray_ld util_ldClamp(cray_ld c, cray_ld lower, cray_ld upper);
+CFLOAT util_ldClamp(CFLOAT c, CFLOAT lower, CFLOAT upper);
 
 // not in use
 // int randomRange(int lower, int upper);
 
 
 vec3 util_randomInUnitSphere();
-cray_ld util_randomLD(cray_ld lower, cray_ld upper);
+CFLOAT util_randomLD(CFLOAT lower, CFLOAT upper);
 
 #endif
 

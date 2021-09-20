@@ -30,7 +30,7 @@ void destroyCamera(Camera* c){
 }
 
 
-void getRay(const Camera* cam, cray_ld u, cray_ld v, vec3* outOrigin, vec3* outDirection){
+void getRay(const Camera* cam, CFLOAT u, CFLOAT v, vec3* outOrigin, vec3* outDirection){
     *outOrigin = cam->origin;
 
     outDirection->x = cam->lower_left_corner.x + u * cam->horizontal.x + v * cam->vertical.x - cam->origin.x;

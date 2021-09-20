@@ -1,6 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-typedef double cray_ld;
+typedef double CFLOAT;
 
 #endif

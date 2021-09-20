@@ -14,7 +14,7 @@ typedef struct {
     vec3 normal;
 
     // distance between origin and point
-    cray_ld distanceFromOrigin;
+    CFLOAT distanceFromOrigin;
     
     // the surface of the object where ray
     // intersected the object
@@ -25,7 +25,7 @@ typedef struct {
 } HitRecord;
 
 // construct a hit record object and return it
-HitRecord hr_setRecord(cray_ld distanceFromOrigin, vec3 point, vec3 normal, vec3 direction);
+HitRecord hr_setRecord(CFLOAT distanceFromOrigin, vec3 point, vec3 normal, vec3 direction);
 
 #endif
 

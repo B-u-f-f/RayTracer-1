@@ -2,7 +2,7 @@
 
 #include <tgmath.h>
 
-HitRecord hit(Sphere s, vec3 origin, vec3 direction, cray_ld t_min, cray_ld t_max){
+HitRecord hit(Sphere s, vec3 origin, vec3 direction, CFLOAT t_min, CFLOAT t_max){
     vec3 oc = origin;
 
     /* 
@@ -15,16 +15,16 @@ HitRecord hit(Sphere s, vec3 origin, vec3 direction, cray_ld t_min, cray_ld t_ma
     vector3_subtract(&oc, &s.center);
 
     // a = dot(direction, direction)
-    cray_ld a = vector3_dot_product(&direction, &direction);
+    CFLOAT a = vector3_dot_product(&direction, &direction);
 
     // half_b = dot((origin - center), direction)
-    cray_ld half_b = vector3_dot_product(&oc, &direction);
+    CFLOAT half_b = vector3_dot_product(&oc, &direction);
     
     // c = dot(origin, origin) - radius^2
-    cray_ld c = vector3_dot_product(&oc, &oc) - s.radius * s.radius;
+    CFLOAT c = vector3_dot_product(&oc, &oc) - s.radius * s.radius;
 
     // discri = half_b^2 - a * c
-    cray_ld discri = half_b * half_b - a*c;
+    CFLOAT discri = half_b * half_b - a*c;
 
     // If the discriminant is less than 0 then no intersection
     if(discri < 0){
@@ -32,10 +32,10 @@ HitRecord hit(Sphere s, vec3 origin, vec3 direction, cray_ld t_min, cray_ld t_ma
     }
 
     // sqrtd = sqrt(discri)
-    cray_ld sqrtd = sqrt(discri);
+    CFLOAT sqrtd = sqrt(discri);
 
     // root1 = (-half_b - sqrtd) / a
-    cray_ld root = (-half_b - sqrtd) / a;
+    CFLOAT root = (-half_b - sqrtd) / a;
 
     // If the intersection point corresponding to this root is 
     // not in the intersection range then check the other point    
@@ -49,7 +49,7 @@ HitRecord hit(Sphere s, vec3 origin, vec3 direction, cray_ld t_min, cray_ld t_ma
     }
 
     // t = root
-    cray_ld t = root;
+    CFLOAT t = root;
 
     // inter1 = direction
     vec3 inter1 = direction;

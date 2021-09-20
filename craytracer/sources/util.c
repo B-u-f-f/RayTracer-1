@@ -3,7 +3,7 @@
 
 #include "util.h"
 
-cray_ld util_ldClamp(cray_ld c, cray_ld lower, cray_ld upper){
+CFLOAT util_ldClamp(CFLOAT c, CFLOAT lower, CFLOAT upper){
     if(c <= lower){
         return lower;
     }
@@ -22,7 +22,7 @@ int randomRange(int lower, int upper){
 */
 
 vec3 util_randomInUnitSphere(){
-    cray_ld x, y, z;
+    CFLOAT x, y, z;
     while(true){
         x = util_randomLD(0.0, 1.0);
         y = util_randomLD(0.0, 1.0);
@@ -42,7 +42,7 @@ vec3 util_randomInUnitSphere(){
     };
 }
 
-cray_ld util_randomLD(cray_ld lower, cray_ld upper){
-    cray_ld scale = rand() / (cray_ld) RAND_MAX;
+CFLOAT util_randomLD(CFLOAT lower, CFLOAT upper){
+    CFLOAT scale = rand() / (CFLOAT) RAND_MAX;
     return scale * (upper - lower) + lower;
 }

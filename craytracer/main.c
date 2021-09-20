@@ -16,14 +16,12 @@
 #include "types.h"
 #include "hypatiaINC.h"
 
-
-
 vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
-    cray_ld r = pixel_color.x;
-    cray_ld g = pixel_color.y;
-    cray_ld b = pixel_color.z;
+    CFLOAT r = pixel_color.x;
+    CFLOAT g = pixel_color.y;
+    CFLOAT b = pixel_color.z;
 
-    cray_ld scale = 1.0/sample_per_pixel;
+    CFLOAT scale = 1.0/sample_per_pixel;
 
     r = sqrt(scale * r);
     g = sqrt(scale * g);
@@ -38,7 +36,7 @@ vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     return temp;
 }
 
-HitRecord hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, cray_ld t_min,cray_ld t_max){
+HitRecord hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, CFLOAT t_min,CFLOAT t_max){
     HitRecord h;
     HitRecord r;
     for(int i = 0; i < n; i++){
@@ -72,7 +70,7 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
 
     vec3 ud = direction;
     vector3_normalize(&ud);
-    cray_ld t = 0.5 * (ud.y + 1.0);
+    CFLOAT t = 0.5 * (ud.y + 1.0);
     vec3 inter4;
     vector3_setf3(&inter4, 1.0 - t, 1.0 - t, 1.0 - t);
     vec3 inter3;
@@ -83,7 +81,7 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
 }
         
 void printProgressBar(int i, int max){
-    int p = (int)(100 * (cray_ld)i/max);
+    int p = (int)(100 * (CFLOAT)i/max);
 
     printf("|");
     for(int j = 0; j < p; j++){
@@ -113,7 +111,7 @@ int main(int argc, char *argv[]){
 
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
-    const cray_ld aspect_ratio = 16.0 / 9.0;
+    const CFLOAT aspect_ratio = 16.0 / 9.0;
     const int WIDTH = 1000;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
@@ -162,8 +160,8 @@ int main(int argc, char *argv[]){
             vector3_zero(&pixel_color);
 
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
-                cray_ld u = ((cray_ld)i + util_randomLD(0.0, 1.0)) / (WIDTH - 1);
-                cray_ld v = ((cray_ld)j + util_randomLD(0.0, 1.0)) / (HEIGHT - 1);
+                CFLOAT u = ((CFLOAT)i + util_randomLD(0.0, 1.0)) / (WIDTH - 1);
+                CFLOAT v = ((CFLOAT)j + util_randomLD(0.0, 1.0)) / (HEIGHT - 1);
                 getRay(c, u, v, &o, &d);
                 temp = ray_c(o, d, 2, s, MAX_DEPTH);
                 vector3_add(&pixel_color, &temp);    
