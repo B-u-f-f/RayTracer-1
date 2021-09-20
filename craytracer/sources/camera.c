@@ -17,8 +17,8 @@ Camera* createCamera(){
     c->vertical.y = c->viewport_height;
     c->horizontal.x = c->viewport_width;
 
-    c->lower_left_corner.x = c->origin.x - c->horizontal.x/2 - c->vertical.x/2 - 0.0f;
-    c->lower_left_corner.y = c->origin.y - c->horizontal.y/2 - c->vertical.y/2 - 0.0f;
+    c->lower_left_corner.x = c->origin.x - c->horizontal.x/2 - c->vertical.x/2 - 0.0;
+    c->lower_left_corner.y = c->origin.y - c->horizontal.y/2 - c->vertical.y/2 - 0.0;
     c->lower_left_corner.z = c->origin.z - c->horizontal.z/2 - c->vertical.z/2 - c->focal_length;
     
     return c;    
@@ -30,7 +30,7 @@ void destroyCamera(Camera* c){
 }
 
 
-void getRay(const Camera* cam, float u, float v, vec3* outOrigin, vec3* outDirection){
+void getRay(const Camera* cam, cray_ld u, cray_ld v, vec3* outOrigin, vec3* outDirection){
     *outOrigin = cam->origin;
 
     outDirection->x = cam->lower_left_corner.x + u * cam->horizontal.x + v * cam->vertical.x - cam->origin.x;

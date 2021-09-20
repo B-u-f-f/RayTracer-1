@@ -13,33 +13,35 @@
 #include "camera.h"
 #include "sphere.h"
 #include "hitRecord.h"
-
+#include "types.h"
 #include "hypatiaINC.h"
 
+
+
 vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
-    float r = pixel_color.x;
-    float g = pixel_color.y;
-    float b = pixel_color.z;
+    cray_ld r = pixel_color.x;
+    cray_ld g = pixel_color.y;
+    cray_ld b = pixel_color.z;
 
-    float scale = 1.0f/sample_per_pixel;
+    cray_ld scale = 1.0/sample_per_pixel;
 
-    r = sqrt(scale*r);
-    g = sqrt(scale*g);
-    b = sqrt(scale*b);
+    r = sqrt(scale * r);
+    g = sqrt(scale * g);
+    b = sqrt(scale * b);
 
     vec3 temp;
     
-    vector3_setf3(&temp, 255.999f*util_ldClamp(r,0.0,0.999),
-                       255.999f*util_ldClamp(g,0.0,0.999),
-                        255.999f*util_ldClamp(b,0.0,0.999));
+    vector3_setf3(&temp, 255.999 * util_ldClamp(r,0.0,0.999),
+                         255.999 * util_ldClamp(g,0.0,0.999),
+                         255.999 * util_ldClamp(b,0.0,0.999));
 
     return temp;
 }
 
-HitRecord hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, float t_min,float t_max){
+HitRecord hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, cray_ld t_min,cray_ld t_max){
     HitRecord h;
     HitRecord r;
-    for(int i=0;i<n;i++){
+    for(int i = 0; i < n; i++){
         r = hit(*sphere[i], o, d, t_min, t_max);
 
         if(r.valid)
@@ -54,7 +56,7 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
     if(depth <= 0)
         return *(vector3_zero(&vertex));
 
-    HitRecord rec = hittableList(n, sphere, origin, direction, 0.001, FLT_MAX);
+    HitRecord rec = hittableList(n, sphere, origin, direction, 0.1, DBL_MAX);
     if(rec.valid){
         vec3 target = rec.point;
         vector3_add(&target, &rec.normal);
@@ -70,7 +72,7 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
 
     vec3 ud = direction;
     vector3_normalize(&ud);
-    float t = 0.5 * (ud.y + 1.0);
+    cray_ld t = 0.5 * (ud.y + 1.0);
     vec3 inter4;
     vector3_setf3(&inter4, 1.0 - t, 1.0 - t, 1.0 - t);
     vec3 inter3;
@@ -81,7 +83,7 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
 }
         
 void printProgressBar(int i, int max){
-    int p = (int)(100 * (float)i/max);
+    int p = (int)(100 * (cray_ld)i/max);
 
     printf("|");
     for(int j = 0; j < p; j++){
@@ -111,7 +113,7 @@ int main(int argc, char *argv[]){
 
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
-    const float aspect_ratio = 16.0f / 9.0f;
+    const cray_ld aspect_ratio = 16.0 / 9.0;
     const int WIDTH = 1000;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
@@ -124,9 +126,9 @@ int main(int argc, char *argv[]){
     
     Sphere s1 = {
         .center = {
-            .x = 0.0f, 
-            .y = -100.5f,
-            .z = -1.0f
+            .x = 0.0, 
+            .y = -100.5,
+            .z = -1.0
         },
 
         .radius = 100
@@ -134,12 +136,12 @@ int main(int argc, char *argv[]){
     
     Sphere s2 = {
         .center = {
-            .x = 0.0f, 
-            .y = 0.0f,
-            .z = -1.0f
+            .x = 0.0, 
+            .y = 0.0,
+            .z = -1.0
         },
 
-        .radius = 0.5f
+        .radius = 0.5
     };
 
 
@@ -160,8 +162,8 @@ int main(int argc, char *argv[]){
             vector3_zero(&pixel_color);
 
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
-                float u = ((float)i + util_randomLD(0.0f, 1.0f)) / (WIDTH - 1);
-                float v = ((float)j + util_randomLD(0.0f, 1.0f)) / (HEIGHT - 1);
+                cray_ld u = ((cray_ld)i + util_randomLD(0.0, 1.0)) / (WIDTH - 1);
+                cray_ld v = ((cray_ld)j + util_randomLD(0.0, 1.0)) / (HEIGHT - 1);
                 getRay(c, u, v, &o, &d);
                 temp = ray_c(o, d, 2, s, MAX_DEPTH);
                 vector3_add(&pixel_color, &temp);    

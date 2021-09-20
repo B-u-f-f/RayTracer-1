@@ -35,9 +35,11 @@ vec3 util_randomInUnitSphere(){
         }
     }
 
-    vec3 r;
-    vector3_setf3(&r, x, y, z);
-    return r;
+    return (vec3){
+        .x = x,
+        .y = y,
+        .z = z
+    };
 }
 
 cray_ld util_randomLD(cray_ld lower, cray_ld upper){

@@ -68,7 +68,6 @@ HitRecord hit(Sphere s, vec3 origin, vec3 direction, cray_ld t_min, cray_ld t_ma
     // n = (p - center)/radius
     vector3_multiplyf(&n, 1/s.radius);
     
-    HitRecord h = hr_setRecord(t, p, n, direction);
-
-    return h;
+    return hr_setRecord(t, p, n, direction);
 }
+
