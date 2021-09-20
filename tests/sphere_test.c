@@ -71,16 +71,16 @@ START_TEST(check_sphere_2){
     HitRecord t_hr = hit(t_sphere, origin, direction, 0.001, F_MAX);
 
     vec3 exp_point = {
-        .x = -1.27768,
-        .y = -2.55537,
-        .z = -4.471897
+        .x = -1.277684881485385,
+        .y = -2.55536976297077,
+        .z = -4.471897085198847
     };
     
     vec3 exp_normal = direction;
     vector3_normalize(&exp_normal);
     vector3_negate(&exp_normal);
 
-    ck_float_equal(5.3066, t_hr.distanceFromOrigin);
+    ck_float_equal(5.30662386291807, t_hr.distanceFromOrigin);
     printf("a %f", t_hr.distanceFromOrigin);
 
     ck_assert_int_eq(1, t_hr.valid);
@@ -257,7 +257,7 @@ START_TEST(check_sphere_7){
         .z = -2.17
     };
 
-
+    vector3_normalize(&direction);
     HitRecord t_hr = hit(t_sphere, origin, direction, 0.001, 1.0);
 
     //printf("b %f", t_hr.distanceFromOrigin);
