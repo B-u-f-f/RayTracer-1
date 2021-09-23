@@ -26,6 +26,7 @@ typedef struct {
 
 // construct a hit record object and return it
 HitRecord hr_setRecord(CFLOAT distanceFromOrigin, vec3 point, vec3 normal, vec3 direction);
+void hr_setRecordi(CFLOAT distanceFromOrigin, vec3 point, vec3 normal, vec3 direction, HitRecord* outRecord);
 
 #endif
 

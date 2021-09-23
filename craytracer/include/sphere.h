@@ -1,6 +1,8 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include <stdbool.h>
+
 #include "hypatiaINC.h"
 #include "hitRecord.h"
 
@@ -14,7 +16,7 @@ typedef struct {
     CFLOAT radius;
 } Sphere;
 
-HitRecord hit(Sphere s, vec3 origin, vec3 direction, CFLOAT t_min, CFLOAT t_max);
+HitRecord* hit(Sphere s, vec3 origin, vec3 direction, CFLOAT t_min, CFLOAT t_max);
 
 #endif
 

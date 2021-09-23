@@ -36,16 +36,17 @@ vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     return temp;
 }
 
-HitRecord hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, CFLOAT t_min,CFLOAT t_max){
-    HitRecord h;
-    HitRecord r;
+HitRecord* hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, CFLOAT t_min, CFLOAT t_max){
+    HitRecord * r = NULL;
+    HitRecord * h = NULL;
+
     for(int i = 0; i < n; i++){
         r = hit(*sphere[i], o, d, t_min, t_max);
 
-        if(r.valid)
+        if(r != NULL){
             h = r;
-    }
-    
+        }
+    }    
     return h;
 }
 
@@ -54,15 +55,15 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
     if(depth <= 0)
         return *(vector3_zero(&vertex));
 
-    HitRecord rec = hittableList(n, sphere, origin, direction, 0.1, DBL_MAX);
-    if(rec.valid){
-        vec3 target = rec.point;
-        vector3_add(&target, &rec.normal);
+    HitRecord *  rec = hittableList(n, sphere, origin, direction, 0.1, DBL_MAX);
+    if(rec != NULL){
+        vec3 target = rec->point;
+        vector3_add(&target, &rec->normal);
         vec3 rand = util_randomInUnitSphere();
         vector3_add(&target, &rand);
         vec3 inter2 = target;
-        vector3_subtract(&inter2, &rec.point);
-        vec3 inter1 = ray_c(rec.point, inter2, n, sphere, depth - 1);
+        vector3_subtract(&inter2, &rec->point);
+        vec3 inter1 = ray_c(rec->point, inter2, n, sphere, depth - 1);
         vector3_multiplyf(&inter1, 0.5);
 
         return inter1;
