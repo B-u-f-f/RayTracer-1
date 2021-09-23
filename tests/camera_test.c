@@ -29,8 +29,8 @@ START_TEST(check_camera_1){
     CFLOAT exp_horizontal_x = 3.5555555555555556;
     
     vec3 exp_lower_left_corner = {
-        .x = -1.0,
-        .y = 1.7777777777777778,
+        .x = -1.7777777777777778,
+        .y = -1.0, 
         .z = -1.0
     };
     
@@ -52,9 +52,6 @@ START_TEST(check_camera_1){
     ck_assert_ld_vec3_eq(c.vertical, exp_vertical);
 
     ck_assert_ld_vec3_eq(c.lower_left_corner, exp_lower_left_corner);
-
-    Ray t_ray = cam_getRay(c,)
-
 }
 END_TEST 
 

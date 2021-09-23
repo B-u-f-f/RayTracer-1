@@ -25,9 +25,9 @@ START_TEST(check_ray_1){
     };
     
     vec3 expected_direction = {
-        .x = 0.4558423058,
-        .y = 0.5698028823,
-        .z = 0.6837634588
+        .x = 0.45584230583855179,
+        .y = 0.56980288229818976,
+        .z =0.68376345875782762
     };
     Ray t_ray = ray_create(origin, direction);
     ck_assert_ld_vec3_eq(origin, t_ray.origin);

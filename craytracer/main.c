@@ -153,7 +153,7 @@ int main(int argc, char *argv[]){
     s[0] = &s1;
     s[1] = &s2;
 
-    Camera c = {
+   Camera c = {
         .origin = {
             .x = 0.0,
             .y = 0.0
