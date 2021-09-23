@@ -14,6 +14,7 @@
 #include "hitRecord.h"
 #include "types.h"
 #include "hypatiaINC.h"
+#include "ray.h"
 
 vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     CFLOAT r = pixel_color.x;
