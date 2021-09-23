@@ -7,19 +7,19 @@
 #include "hypatiaINC.h"
 #include "sphere.h"
 #include "testutils.h"
+#include "ray.h"
 
 
 
 //discriminant < 0 so no intersection
 START_TEST(check_sphere_1){
-    vec3 center = {
-        .x = 2.0,
-        .y = 4.0,
-        .z = 7.0
-    };
-    
+   
     Sphere test_sphere = {
-        .center = center,
+        .center = {
+            .x = 2.0,
+            .y = 4.0,
+            .z = 7.0
+        },
         .radius = 5.0
     };
 
@@ -34,22 +34,23 @@ START_TEST(check_sphere_1){
         .y = 33.03,
         .z = 0.0
     };
+
+    Ray r = ray_create(origin, direction);
     
-    HitRecord t_hr = *hit(test_sphere, origin, direction, 0.001, F_MAX); 
+    HitRecord t_hr = *hit(test_sphere, r, 0.001, F_MAX);
     ck_assert_int_eq(t_hr.valid, 0);
 }
 END_TEST
 
 // ray originates from outside and hits the sphere
 START_TEST(check_sphere_2){
-    vec3 cen = {
-        .x = -2.0,
-        .y = -4.0,
-        .z = -7.0
-    };
     
     Sphere t_sphere = {
-        .center = cen,
+        .center = {
+            .x = -2.0,
+            .y = -4.0,
+            .z = -7.0
+        },
         .radius = 3.0
     };
     
@@ -64,10 +65,10 @@ START_TEST(check_sphere_2){
         .y = -4.0,
         .z = -7.0
     };
-    
-    vector3_normalize(&direction);
 
-    HitRecord t_hr = *hit(t_sphere, origin, direction, 0.001, F_MAX);
+    Ray r = ray_create(origin, direction);
+
+    HitRecord t_hr = *hit(t_sphere, r, 0.001, F_MAX);
 
     vec3 exp_point = {
         .x = -1.277684881485385,
@@ -80,7 +81,6 @@ START_TEST(check_sphere_2){
     vector3_negate(&exp_normal);
 
     ck_float_equal(5.30662386291807, t_hr.distanceFromOrigin);
-    printf("a %f", t_hr.distanceFromOrigin);
 
     ck_assert_int_eq(1, t_hr.valid);
     ck_assert_ld_vec3_eq(exp_point, t_hr.point);
@@ -91,13 +91,13 @@ END_TEST
 
 // ray coming from outside - root < t_min
 START_TEST(check_sphere_3){
-    vec3 cen = {
-        .x = -2.0,
-        .y = -4.0,
-        .z = -7.0
-    };
+
     Sphere t_sphere = {
-        .center = cen,
+        .center = {
+            .x = -2.0,
+            .y = -4.0,
+            .z = -7.0
+        },
         .radius = 3.0
     };
 
@@ -112,9 +112,10 @@ START_TEST(check_sphere_3){
         .z = -7.0
 
     };
-    vector3_normalize(&direction);
 
-    HitRecord t_hr = *hit(t_sphere, origin, direction, 100.0, F_MAX);
+    Ray r = ray_create(origin, direction);
+
+    HitRecord t_hr = *hit(t_sphere, r, 100.0, F_MAX);
     ck_assert_int_eq(0 ,t_hr.valid);
    
 }
@@ -122,13 +123,13 @@ END_TEST
 
 // ray coming from outside - root > t_max 
 START_TEST(check_sphere_4){
-    vec3 cen={
-        .x = -2.0,
-        .y = -4.0,
-        .z = -7.0
-    };
+
     Sphere t_sphere = {
-        .center = cen,
+        .center = {
+            .x = -2.0,
+            .y = -4.0,
+            .z = -7.0
+        },        
         .radius = 3.0
     };
 
@@ -143,10 +144,10 @@ START_TEST(check_sphere_4){
         .y = -4.0,
         .z = -7.0
     };
-    
-    vector3_normalize(&direction);
 
-    HitRecord t_hr = *hit(t_sphere, origin, direction, 0.001, 4.0);
+    Ray r = ray_create(origin, direction);
+
+    HitRecord t_hr = *hit(t_sphere, r, 0.001, 4.0);
     
     ck_assert_int_eq(0 ,t_hr.valid);
 }
@@ -154,13 +155,13 @@ END_TEST
 
 // ray originates from within the sphere
 START_TEST(check_sphere_5){
-    vec3 cen={
-        .x = -2.0,
-        .y = -4.0,
-        .z = -7.0
-    };
+
     Sphere t_sphere = {
-        .center = cen,
+        .center = {
+            .x = -2.0,
+            .y = -4.0,
+            .z = -7.0
+        },
         .radius = 3.0
     };
 
@@ -176,9 +177,9 @@ START_TEST(check_sphere_5){
         .z = -2.0
     };
     
-    vector3_normalize(&direction);
+    Ray r = ray_create(origin, direction);
 
-    HitRecord t_hr = *hit(t_sphere, origin, direction, 0.001, F_MAX);
+    HitRecord t_hr = *hit(t_sphere, r, 0.001, F_MAX);
     
     vec3 exp_point = {
         .x = -3.0,
@@ -201,13 +202,13 @@ END_TEST
 
 // ray originates inside the sphere and and root < t_min
 START_TEST(check_sphere_6){
-    vec3 cen={
-        .x = -2.0,
-        .y = -4.0,
-        .z = -7.0
-    };
+
     Sphere t_sphere = {
-        .center = cen,
+        .center = {
+            .x = -2.0,
+            .y = -4.0,
+            .z = -7.0 
+        },
         .radius = 3.0
     };
 
@@ -222,9 +223,9 @@ START_TEST(check_sphere_6){
         .z = -2.17
     };
     
-    vector3_normalize(&direction);
+    Ray r = ray_create(origin, direction);
 
-    HitRecord t_hr = *hit(t_sphere, origin, direction, 10000.0, F_MAX);
+    HitRecord t_hr = *hit(t_sphere, r, 10000.0, F_MAX);
 
     ck_assert_int_eq(0 ,t_hr.valid);
     
@@ -234,13 +235,13 @@ END_TEST
 
 // ray originates inside the sphere and and root > t_max
 START_TEST(check_sphere_7){
-    vec3 cen={
-        .x = -2.0,
-        .y = -4.0,
-        .z = -7.0
-    };
+
     Sphere t_sphere = {
-        .center = cen,
+        .center = {
+            .x = -2.0,
+            .y = -4.0,
+            .z = -7.0 
+        },
         .radius = 3.0
     };
 
@@ -256,9 +257,9 @@ START_TEST(check_sphere_7){
         .z = -2.17
     };
 
-    vector3_normalize(&direction);
-    HitRecord t_hr = *hit(t_sphere, origin, direction, 0.001, 1.0);
+    Ray r = ray_create(origin, direction);
 
+    HitRecord t_hr = *hit(t_sphere, r, 0.001, 1.0);
 
     ck_assert_int_eq(t_hr.valid, 0);
 

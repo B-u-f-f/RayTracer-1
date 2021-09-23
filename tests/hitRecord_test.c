@@ -12,37 +12,65 @@
 
 
 START_TEST(check_hr_1){
-    vec3 point;
-    vector3_setf3(&point,-1.0L,-2.0L,-3.0L);
-    vec3 normal;
-    vector3_setf3(&normal,3.0L,1.0L,-7.0L);
-    vec3 direction;
-    vector3_setf3(&direction,2.0L,3.0L,10.0L);
-    HitRecord temp_hr_1 = hr_setRecord(4.0L,point,normal,direction);
+    vec3 point = {
+        .x = -1.0,
+        .y = -2.0,
+        .z = -3.0
+    };
+    
+    vec3 normal = {
+        .x = 3.0,
+        .y = 1.0,
+        .z = -7.0
+    };
+    
+    vec3 direction = {
+        .x = 2.0,
+        .y = 3.0,
+        .z = 10.0
+    };
+        
+    HitRecord temp_hr_1 = hr_setRecord(4.0, point, normal, direction);
+    
     ck_assert_ld_vec3_eq(point, temp_hr_1.point);
     ck_assert_ld_vec3_eq(normal, temp_hr_1.normal);
     ck_assert_int_eq(1, temp_hr_1.frontFace);
-    ck_assert_ldouble_eq(4.0L, temp_hr_1.distanceFromOrigin);
+    ck_float_equal(4.0, temp_hr_1.distanceFromOrigin);
     ck_assert_int_eq(1, temp_hr_1.valid);
     
 }
 END_TEST
 
 START_TEST(check_hr_2){
-    vec3 p;
-    vector3_setf3(&p, -3.0L, -2.0L, -4.0L);
-    vec3 n;
-    vector3_setf3(&n, -4.0L, -5.0L, -9.0L);
-    vec3 d;
-    vector3_setf3(&d, -2.0L, -7.0L, -4.0L);
-    HitRecord t_hr = hr_setRecord(7.0L, p, n, d);
+    vec3 p ={
+        .x = -3.0,
+        .y = -2.0,
+        .z = -4.0
+    };
 
-    vec3 ne_n;
-    vector3_setf3(&ne_n, 4.0L, 5.0L, 9.0L);
+    vec3 n = {
+        .x = -4.0,
+        .y = -5.0,
+        .z = -9.0
+    };
+
+    vec3 d = {
+        .x = -2.0,
+        .y = -7.0,
+        .z = -4.0
+    };
+
+    HitRecord t_hr = hr_setRecord(7.0, p, n, d);
+
+    vec3 ne_n = {
+        .x = 4.0,
+        .y = 5.0,
+        .z = 9.0
+    };
 
     ck_assert_ld_vec3_eq(p, t_hr.point);
     ck_assert_ld_vec3_eq(ne_n, t_hr.normal);
-    ck_assert_ldouble_eq(7.0L, t_hr.distanceFromOrigin);
+    ck_float_equal(7.0, t_hr.distanceFromOrigin);
     ck_assert_int_eq(0, t_hr.frontFace);
     ck_assert_int_eq(1, t_hr.valid);
 }

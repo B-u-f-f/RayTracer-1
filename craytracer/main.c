@@ -153,7 +153,19 @@ int main(int argc, char *argv[]){
     s[0] = &s1;
     s[1] = &s2;
 
-    Camera* c = createCamera();
+    Camera c = {
+        .origin = {
+            .x = 0.0,
+            .y = 0.0
+        },
+
+        .aspect_ratio = 16.0/9.0,
+        .viewport_height = 2.0,
+        .focal_length = 1.0
+    };
+
+    cam_setCamera(&c);
+
     vec3 pixel_color;
     Ray r;
     vec3 temp;
@@ -168,7 +180,7 @@ int main(int argc, char *argv[]){
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
                 CFLOAT u = ((CFLOAT)i + util_randomLD(0.0, 1.0)) / (WIDTH - 1);
                 CFLOAT v = ((CFLOAT)j + util_randomLD(0.0, 1.0)) / (HEIGHT - 1);
-                getRay(c, u, v, &r);
+                r = cam_getRay(&c, u, v);
                 temp = ray_c(r, 2, s, MAX_DEPTH);
                 vector3_add(&pixel_color, &temp);    
             }
@@ -182,7 +194,6 @@ int main(int argc, char *argv[]){
 
     writeToPPM(argv[1], WIDTH, HEIGHT, image);
     free(image);
-    destroyCamera(c);
 
     return 0;
 }

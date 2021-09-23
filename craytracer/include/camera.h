@@ -9,19 +9,19 @@
 
 typedef struct camera {
     vec3 origin;
+    CFLOAT aspect_ratio;
+    CFLOAT viewport_height;
+    CFLOAT focal_length;
+
+    CFLOAT viewport_width;
     vec3 lower_left_corner;
     vec3 horizontal;
     vec3 vertical;
-    CFLOAT aspect_ratio;
-    CFLOAT viewport_height;
-    CFLOAT viewport_width;
-    CFLOAT focal_length;
 
 } Camera;
 
-Camera* createCamera(void);
-void destroyCamera(Camera* c);
-void getRay(const Camera* cam, CFLOAT u, CFLOAT v, Ray* outRay);
+void cam_setCamera(Camera * restrict c);
+Ray cam_getRay(const Camera * restrict cam, CFLOAT u, CFLOAT v);
 
 
 #endif
