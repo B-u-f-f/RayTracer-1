@@ -1,9 +1,10 @@
 #include "ray.h"
 
-void normalize_ray_direction(Ray *ray){
-    vec3 d = ray->direction;
-
+Ray ray_create(vec3 origin, vec3 direction){
     vector3_normalize(&direction);
-
-    ray->direction = d;
+    
+    return (Ray){
+        .origin = origin,
+        .direction = direction
+    };
 }

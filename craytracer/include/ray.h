@@ -3,8 +3,7 @@
 
 #include "hypatiaINC.h"
 
-typedef struct {
-
+typedef struct ray {
     // origin of the ray
     vec3 origin;
 
@@ -12,6 +11,6 @@ typedef struct {
     vec3 direction;
 } Ray;
 
-void normalize_ray_direction(Ray *ray);
+Ray ray_create(vec3 origin, vec3 direction);
 
 #endif
