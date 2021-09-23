@@ -1,9 +1,9 @@
 #include "sphere.h"
-
 #include <tgmath.h>
 
-HitRecord hit(Sphere s, vec3 origin, vec3 direction, CFLOAT t_min, CFLOAT t_max){
-    vec3 oc = origin;
+HitRecord hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
+    vec3 oc = r.origin;
+    vec3 direction = r.direction;
 
     /* 
      * center - center of the sphere

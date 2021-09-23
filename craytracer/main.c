@@ -36,11 +36,11 @@ vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     return temp;
 }
 
-HitRecord hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, CFLOAT t_min,CFLOAT t_max){
+HitRecord hittableList(int n, Sphere *sphere[n], Ray r, CFLOAT t_min,CFLOAT t_max){
     HitRecord h;
     HitRecord r;
     for(int i = 0; i < n; i++){
-        r = hit(*sphere[i], o, d, t_min, t_max);
+        r = hit(*sphere[i], r, t_min, t_max);
 
         if(r.valid)
             h = r;
@@ -49,12 +49,12 @@ HitRecord hittableList(int n, Sphere *sphere[n], vec3 o, vec3 d, CFLOAT t_min,CF
     return h;
 }
 
-vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
+vec3 ray_c(Ray r, int n, Sphere* sphere[n], int depth){
     vec3 vertex;
     if(depth <= 0)
         return *(vector3_zero(&vertex));
 
-    HitRecord rec = hittableList(n, sphere, origin, direction, 0.1, DBL_MAX);
+    HitRecord rec = hittableList(n, sphere, r, 0.1, DBL_MAX);
     if(rec.valid){
         vec3 target = rec.point;
         vector3_add(&target, &rec.normal);
@@ -68,7 +68,7 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
         return inter1;
     }
 
-    vec3 ud = direction;
+    vec3 ud = r.direction;
     vector3_normalize(&ud);
     CFLOAT t = 0.5 * (ud.y + 1.0);
     vec3 inter4;
@@ -148,8 +148,7 @@ int main(int argc, char *argv[]){
 
     Camera* c = createCamera();
     vec3 pixel_color;
-    vec3 o;
-    vec3 d;
+    Ray r;
     vec3 temp;
     
 
@@ -162,8 +161,8 @@ int main(int argc, char *argv[]){
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
                 CFLOAT u = ((CFLOAT)i + util_randomLD(0.0, 1.0)) / (WIDTH - 1);
                 CFLOAT v = ((CFLOAT)j + util_randomLD(0.0, 1.0)) / (HEIGHT - 1);
-                getRay(c, u, v, &o, &d);
-                temp = ray_c(o, d, 2, s, MAX_DEPTH);
+                getRay(c, u, v, &r);
+                temp = ray_c(r, 2, s, MAX_DEPTH);
                 vector3_add(&pixel_color, &temp);    
             }
 
