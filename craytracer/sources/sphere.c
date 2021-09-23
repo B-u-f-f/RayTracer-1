@@ -1,10 +1,10 @@
 #include "sphere.h"
 #include <tgmath.h>
 
-HitRecord hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
+HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
     vec3 oc = r.origin;
     vec3 direction = r.direction;
-
+    
     /* 
      * center - center of the sphere
      * radius - radius of the sphere
@@ -28,7 +28,7 @@ HitRecord hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
 
     // If the discriminant is less than 0 then no intersection
     if(discri < 0){
-        return (HitRecord){0};
+        return NULL;
     }
 
     // sqrtd = sqrt(discri)
@@ -44,8 +44,10 @@ HitRecord hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
 
         // If neither roots correspond to an intersection point in
         // the intersection range then return invalid
-        if(root < t_min || t_max < root)
-            return (HitRecord){0};
+        if(root < t_min || t_max < root){
+            return NULL;
+     
+        }
     }
 
     // t = root
@@ -68,6 +70,8 @@ HitRecord hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
     // n = (p - center)/radius
     vector3_multiplyf(&n, 1/s.radius);
     
-    return hr_setRecord(t, p, n, direction);
+    HitRecord * outRecord = (HitRecord *) malloc(sizeof(HitRecord));
+    hr_setRecordi(t, p, n, direction, outRecord);
+    return outRecord;
 }
 

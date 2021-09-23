@@ -35,8 +35,7 @@ START_TEST(check_sphere_1){
         .z = 0.0
     };
     
-    HitRecord t_hr = hit(test_sphere, origin, direction, 0.001, F_MAX);
-    
+    HitRecord t_hr = *hit(test_sphere, origin, direction, 0.001, F_MAX); 
     ck_assert_int_eq(t_hr.valid, 0);
 }
 END_TEST
@@ -68,7 +67,7 @@ START_TEST(check_sphere_2){
     
     vector3_normalize(&direction);
 
-    HitRecord t_hr = hit(t_sphere, origin, direction, 0.001, F_MAX);
+    HitRecord t_hr = *hit(t_sphere, origin, direction, 0.001, F_MAX);
 
     vec3 exp_point = {
         .x = -1.277684881485385,
@@ -115,7 +114,7 @@ START_TEST(check_sphere_3){
     };
     vector3_normalize(&direction);
 
-    HitRecord t_hr = hit(t_sphere, origin, direction, 100.0, F_MAX);
+    HitRecord t_hr = *hit(t_sphere, origin, direction, 100.0, F_MAX);
     ck_assert_int_eq(0 ,t_hr.valid);
    
 }
@@ -147,7 +146,7 @@ START_TEST(check_sphere_4){
     
     vector3_normalize(&direction);
 
-    HitRecord t_hr = hit(t_sphere, origin, direction, 0.001, 4.0);
+    HitRecord t_hr = *hit(t_sphere, origin, direction, 0.001, 4.0);
     
     ck_assert_int_eq(0 ,t_hr.valid);
 }
@@ -179,7 +178,7 @@ START_TEST(check_sphere_5){
     
     vector3_normalize(&direction);
 
-    HitRecord t_hr = hit(t_sphere, origin, direction, 0.001, F_MAX);
+    HitRecord t_hr = *hit(t_sphere, origin, direction, 0.001, F_MAX);
     
     vec3 exp_point = {
         .x = -3.0,
@@ -225,7 +224,7 @@ START_TEST(check_sphere_6){
     
     vector3_normalize(&direction);
 
-    HitRecord t_hr = hit(t_sphere, origin, direction, 10000.0, F_MAX);
+    HitRecord t_hr = *hit(t_sphere, origin, direction, 10000.0, F_MAX);
 
     ck_assert_int_eq(0 ,t_hr.valid);
     
@@ -258,9 +257,8 @@ START_TEST(check_sphere_7){
     };
 
     vector3_normalize(&direction);
-    HitRecord t_hr = hit(t_sphere, origin, direction, 0.001, 1.0);
+    HitRecord t_hr = *hit(t_sphere, origin, direction, 0.001, 1.0);
 
-    //printf("b %f", t_hr.distanceFromOrigin);
 
     ck_assert_int_eq(t_hr.valid, 0);
 
@@ -305,3 +303,4 @@ int main(void){
 
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
