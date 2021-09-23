@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
-#include <float.h>
 
 #include "outfile.h"
 #include "util.h"
@@ -55,7 +54,7 @@ vec3 ray_c(vec3 origin, vec3 direction, int n, Sphere* sphere[n], int depth){
     if(depth <= 0)
         return *(vector3_zero(&vertex));
 
-    HitRecord *  rec = hittableList(n, sphere, origin, direction, 0.1, DBL_MAX);
+    HitRecord *  rec = hittableList(n, sphere, origin, direction, 0.1, FLT_MAX);
     if(rec != NULL){
         vec3 target = rec->point;
         vector3_add(&target, &rec->normal);
