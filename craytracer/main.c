@@ -14,6 +14,7 @@
 #include "hitRecord.h"
 #include "types.h"
 #include "hypatiaINC.h"
+#include "ray.h"
 
 vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     CFLOAT r = pixel_color.x;
@@ -152,7 +153,7 @@ int main(int argc, char *argv[]){
     s[0] = &s1;
     s[1] = &s2;
 
-    Camera c = {
+   Camera c = {
         .origin = {
             .x = 0.0,
             .y = 0.0

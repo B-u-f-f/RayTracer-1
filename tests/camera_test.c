@@ -30,8 +30,8 @@ START_TEST(check_camera_1){
     CFLOAT exp_horizontal_x = 3.555555555555556;
     
     vec3 exp_lower_left_corner = {
-        .x = -1.777777777777778,
-        .y = -1.0,
+        .x = -1.7777777777777778,
+        .y = -1.0, 
         .z = -1.0
     };
     
@@ -53,11 +53,10 @@ START_TEST(check_camera_1){
     ck_assert_ld_vec3_eq(c.vertical, exp_vertical);
 
     ck_assert_ld_vec3_eq(c.lower_left_corner, exp_lower_left_corner);
-
 }
 END_TEST 
 
-START_TEST{
+START_TEST(check_camera_2){
       Camera c = {
         .origin = {
             .x = 0.0,
@@ -72,19 +71,19 @@ START_TEST{
 
     cam_setCamera(&c);
 
-    expected_direction = {
-        .x = -1.7653208764319895553998442887332,
-        .y = -0.976827094474154,
-        .z = -1.0
+    // vec3 expected_direction = {
+    //     .x = -1.765320876431989,
+    //     .y = -0.976827094474154,
+    //     .z = -1.0
+    // };
+
+    vec3 exp_normal_direction = {
+        .x = -0.783964083681654,
+        .y = -0.43380065814587093,
+        .z = -0.44409154967122894
     };
 
-    exp_normal_direction = {
-        .x = -0.783963978420290881731340761905843302516313717200479974562414012,
-        .y = -0.433800599900283386541172207305667590081828379783869337494770817,
-        .z = -0.444091490043902928608668852191105193832806492268803518629212545
-    };
-
-    exp_origin = {
+    vec3 exp_origin = {
         .x = 0.0,
         .y = 0.0,
         .z = 0.0
@@ -108,6 +107,7 @@ Suite* hr_suite(void){
     tc_core = tcase_create("Core");
 
     tcase_add_test(tc_core, check_camera_1);
+    tcase_add_test(tc_core, check_camera_2);
     suite_add_tcase(s, tc_core);
 
     return s;
