@@ -4,7 +4,7 @@
 HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
     vec3 oc = r.origin;
     vec3 direction = r.direction;
-    
+
     /* 
      * center - center of the sphere
      * radius - radius of the sphere
@@ -60,7 +60,7 @@ HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
     vector3_multiplyf(&inter1, root);
 
     // p = inter1 + origin
-    vec3 p = *(vector3_add(&inter1, &origin));
+    vec3 p = *(vector3_add(&inter1, &r.origin));
     // n = p
     vec3 n = p;
     

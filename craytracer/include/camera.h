@@ -5,6 +5,7 @@
 
 #include "hypatiaINC.h"
 #include "types.h"
+#include "ray.h"
 
 typedef struct camera {
     vec3 origin;
@@ -20,7 +21,7 @@ typedef struct camera {
 
 Camera* createCamera(void);
 void destroyCamera(Camera* c);
-void getRay(const Camera* cam, CFLOAT u, CFLOAT v, vec3* outOrigin, vec3* outDirection);
+void getRay(const Camera* cam, CFLOAT u, CFLOAT v, Ray* outRay);
 
 
 #endif

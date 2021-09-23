@@ -62,7 +62,13 @@ vec3 ray_c(Ray r, int n, Sphere* sphere[n], int depth){
         vector3_add(&target, &rand);
         vec3 inter2 = target;
         vector3_subtract(&inter2, &rec->point);
-        vec3 inter1 = ray_c(rec->point, inter2, n, sphere, depth - 1);
+        
+        Ray r_t = {
+            .origin = rec->point,
+            .direction = inter2
+        };
+
+        vec3 inter1 = ray_c(r_t, n, sphere, depth - 1);
         vector3_multiplyf(&inter1, 0.5);
 
         return inter1;
