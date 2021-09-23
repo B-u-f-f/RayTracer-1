@@ -53,6 +53,8 @@ START_TEST(check_camera_1){
 
     ck_assert_ld_vec3_eq(c.lower_left_corner, exp_lower_left_corner);
 
+    Ray t_ray = cam_getRay(c,)
+
 }
 END_TEST 
 
