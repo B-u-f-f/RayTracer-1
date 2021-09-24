@@ -5,7 +5,10 @@
 #include "ray.h"
 
 
-static bool mat_metalScatter(const MetalMat * restrict nmetalMat, const Ray * restrict rayIn, const HitRecord * restrict rec, vec3 * restrict attenuation, Ray * restrict out){
+static bool mat_metalScatter(const MetalMat * restrict nmetalMat, 
+                             const Ray * restrict rayIn, 
+                             const HitRecord * restrict rec, 
+                             vec3 * restrict attenuation, Ray * restrict out){
     
     vec3 direction = rayIn->direction;
         
@@ -20,7 +23,9 @@ static bool mat_metalScatter(const MetalMat * restrict nmetalMat, const Ray * re
     return (dot_prod > 0);
 }
 
-static bool mat_lambScatter(const LambertianMat * restrict nlambMat, const HitRecord * restrict rec, vec3 * restrict attenuation, Ray * restrict out){
+static bool mat_lambScatter(const LambertianMat * restrict nlambMat, 
+                            const HitRecord * restrict rec, 
+                            vec3 * restrict attenuation, Ray * restrict out){
     
     vec3 scatter_direction = rec->normal;
     vec3 rndm = util_randomUnitVector();

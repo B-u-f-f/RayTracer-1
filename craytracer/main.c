@@ -115,7 +115,7 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 16.0 / 9.0;
-    const int WIDTH = 250;
+    const int WIDTH = 100;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
@@ -123,43 +123,25 @@ int main(int argc, char *argv[]){
     vec3* image = (vec3*) malloc(sizeof(vec3) * HEIGHT * WIDTH);
 
     LambertianMat materialGround = {
-        .albedo = {
-            .x = 0.8,
-            .y = 0.8, 
-            .z = 0.0
-        }
+        .albedo = {.x = 0.8, .y = 0.8, .z = 0.0}
     };
+
     LambertianMat materialCenter = {
-        .albedo = {
-            .x = 0.7,
-            .y = 0.3,
-            .z = 0.3
-        }
+        .albedo = {.x = 0.7, .y = 0.3, .z = 0.3}
     }; 
+
     MetalMat materialLeft = {
-        .albedo = {
-            .x = 0.8,
-            .y = 0.8, 
-            .z = 0.8
-        }
+        .albedo = {.x = 0.8, .y = 0.8, .z = 0.8}
     };
     MetalMat materialRight = {
-        .albedo = {
-            .x = 0.8,
-            .y = 0.6,
-            .z = 0.2
-        }
+        .albedo = {.x = 0.8, .y = 0.6,.z = 0.2}
     }; 
 
 
     Sphere * s[4];
     
     Sphere s1 = {
-        .center = {
-            .x = 0.0, 
-            .y = -100.5,
-            .z = -1.0
-        },
+        .center = { .x = 0.0, .y = -100.5, .z = -1.0},
         .radius = 100,
         .sphMat = {
             .mat = &materialGround,
@@ -238,7 +220,7 @@ int main(int argc, char *argv[]){
                 CFLOAT u = ((CFLOAT)i + util_randomFloat(0.0, 1.0)) / (WIDTH - 1);
                 CFLOAT v = ((CFLOAT)j + util_randomFloat(0.0, 1.0)) / (HEIGHT - 1);
                 r = cam_getRay(&c, u, v);
-                temp = ray_c(r, 2, s, MAX_DEPTH);
+                temp = ray_c(r, 4, s, MAX_DEPTH);
                 vector3_add(&pixel_color, &temp);    
             }
 

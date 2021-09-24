@@ -6,7 +6,8 @@ set(SOURCES ${SRC_FILES})
 
 add_library(${LIB_NAME} STATIC ${SOURCES})
 target_link_libraries(${LIB_NAME} m)
-target_compile_options(${LIB_NAME} PUBLIC -Wall -Werror -Wpedantic -Wextra -g)
+target_link_options(${LIB_NAME} PUBLIC -fsanitize=undefined)
+target_compile_options(${LIB_NAME} PUBLIC -Wall -Werror -Wpedantic -Wextra -fsanitize=undefined -g)
 target_include_directories(${LIB_NAME} PUBLIC ${SOURCE_DIR}/include)
 
 add_executable(${BINARY} main.c)

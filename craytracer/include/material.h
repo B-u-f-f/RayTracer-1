@@ -22,7 +22,7 @@ typedef enum materialType {
 } MaterialType;
 
 typedef struct material {
-    void * mat;
+    const void * mat;
     MaterialType matType;
 } Material;
 
