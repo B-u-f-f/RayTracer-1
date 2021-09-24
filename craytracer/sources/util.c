@@ -3,7 +3,7 @@
 
 #include "util.h"
 
-CFLOAT util_ldClamp(CFLOAT c, CFLOAT lower, CFLOAT upper){
+CFLOAT util_floatClamp(CFLOAT c, CFLOAT lower, CFLOAT upper){
     if(c <= lower){
         return lower;
     }
@@ -21,12 +21,12 @@ int randomRange(int lower, int upper){
 }
 */
 
-vec3 util_randomInUnitSphere(){
+vec3 util_randomUnitSphere(){
     CFLOAT x, y, z;
     while(true){
-        x = util_randomLD(0.0, 1.0);
-        y = util_randomLD(0.0, 1.0);
-        z = util_randomLD(0.0, 1.0);
+        x = util_randomFloat(0.0, 1.0);
+        y = util_randomFloat(0.0, 1.0);
+        z = util_randomFloat(0.0, 1.0);
 
         if(x*x + y*y + z*z >= 1){
             continue;
@@ -42,7 +42,7 @@ vec3 util_randomInUnitSphere(){
     };
 }
 
-CFLOAT util_randomLD(CFLOAT lower, CFLOAT upper){
+CFLOAT util_randomFloat(CFLOAT lower, CFLOAT upper){
     CFLOAT scale = rand() / (CFLOAT) RAND_MAX;
     return scale * (upper - lower) + lower;
 }

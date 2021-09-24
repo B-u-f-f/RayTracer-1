@@ -11,6 +11,6 @@ typedef struct ray {
     vec3 direction;
 } Ray;
 
-Ray ray_create(vec3 origin, vec3 direction);
+extern Ray ray_create(vec3 origin, vec3 direction);
 
 #endif

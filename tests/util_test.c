@@ -7,34 +7,34 @@
 #include "util.h"
 
 START_TEST(check_util_h_1){
-    ck_assert_float_eq(util_ldClamp(8.9L, 6.0L, 8.0L), 8.0L);
+    ck_assert_float_eq(util_floatClamp(8.9L, 6.0L, 8.0L), 8.0L);
 }
 END_TEST
 
 START_TEST(check_util_h_2){
-    ck_assert_float_eq(util_ldClamp(5.9L, 6.0L, 8.0L), 6.0L);
+    ck_assert_float_eq(util_floatClamp(5.9L, 6.0L, 8.0L), 6.0L);
 }
 END_TEST
 
 START_TEST(check_util_h_3){
-    ck_assert_float_eq(util_ldClamp(7.0L, 6.0L, 8.0L),7.0L);
+    ck_assert_float_eq(util_floatClamp(7.0L, 6.0L, 8.0L),7.0L);
 }
 END_TEST
 
 START_TEST(check_util_h_4){
-    ck_assert_ldouble_lt(util_randomLD(3.0L,5.0L),5.0L);
-    ck_assert_ldouble_ge(util_randomLD(3.0L,5.0L),3.0L);
+    ck_assert_ldouble_lt(util_randomFloat(3.0L,5.0L),5.0L);
+    ck_assert_ldouble_ge(util_randomFloat(3.0L,5.0L),3.0L);
 
-    ck_assert_ldouble_lt(util_randomLD(100.0L,50.0L),100.0L);
-    ck_assert_ldouble_ge(util_randomLD(100.0L,50.0L),50.0L);
+    ck_assert_ldouble_lt(util_randomFloat(100.0L,50.0L),100.0L);
+    ck_assert_ldouble_ge(util_randomFloat(100.0L,50.0L),50.0L);
 
-    ck_assert_ldouble_lt(util_randomLD(34.0L,1353.0L),1353.0L);
-    ck_assert_ldouble_ge(util_randomLD(34.0L,1353.0L),34.0L);
+    ck_assert_ldouble_lt(util_randomFloat(34.0L,1353.0L),1353.0L);
+    ck_assert_ldouble_ge(util_randomFloat(34.0L,1353.0L),34.0L);
 }END_TEST
 
 START_TEST(check_util_h_5){
     vec3 t;
-    t = util_randomInUnitSphere();
+    t = util_randomUnitSphere();
     
     ck_assert_ldouble_lt(t.x, 1.0L);
     ck_assert_ldouble_ge(t.x, 0.0L);

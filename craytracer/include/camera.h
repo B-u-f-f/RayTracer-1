@@ -20,8 +20,8 @@ typedef struct camera {
 
 } Camera;
 
-void cam_setCamera(Camera * restrict c);
-Ray cam_getRay(const Camera * restrict cam, CFLOAT u, CFLOAT v);
+extern void cam_setCamera(Camera * restrict c);
+extern Ray cam_getRay(const Camera * restrict cam, CFLOAT u, CFLOAT v);
 
 
 #endif

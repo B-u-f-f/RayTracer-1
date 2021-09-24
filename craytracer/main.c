@@ -29,9 +29,9 @@ vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
 
     vec3 temp;
     
-    vector3_setf3(&temp, 255.999 * util_ldClamp(r,0.0,0.999),
-                         255.999 * util_ldClamp(g,0.0,0.999),
-                         255.999 * util_ldClamp(b,0.0,0.999));
+    vector3_setf3(&temp, 255.999 * util_floatClamp(r,0.0,0.999),
+                         255.999 * util_floatClamp(g,0.0,0.999),
+                         255.999 * util_floatClamp(b,0.0,0.999));
 
     return temp;
 }
@@ -59,7 +59,7 @@ vec3 ray_c(Ray r, int n, Sphere* sphere[n], int depth){
     if(rec != NULL){
         vec3 target = rec->point;
         vector3_add(&target, &rec->normal);
-        vec3 rand = util_randomInUnitSphere();
+        vec3 rand = util_randomUnitSphere();
         vector3_add(&target, &rand);
         vec3 inter2 = target;
         vector3_subtract(&inter2, &rec->point);
@@ -178,8 +178,8 @@ int main(int argc, char *argv[]){
             vector3_zero(&pixel_color);
 
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
-                CFLOAT u = ((CFLOAT)i + util_randomLD(0.0, 1.0)) / (WIDTH - 1);
-                CFLOAT v = ((CFLOAT)j + util_randomLD(0.0, 1.0)) / (HEIGHT - 1);
+                CFLOAT u = ((CFLOAT)i + util_randomFloat(0.0, 1.0)) / (WIDTH - 1);
+                CFLOAT v = ((CFLOAT)j + util_randomFloat(0.0, 1.0)) / (HEIGHT - 1);
                 r = cam_getRay(&c, u, v);
                 temp = ray_c(r, 2, s, MAX_DEPTH);
                 vector3_add(&pixel_color, &temp);    

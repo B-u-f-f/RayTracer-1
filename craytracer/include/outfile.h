@@ -3,7 +3,7 @@
 
 #include "hypatiaINC.h"
 
-void writeToPPM(const char * filename, int width, int height, const vec3* arr);
+extern void writeToPPM(const char * filename, int width, int height, const vec3* arr);
 
 #endif
 

@@ -4,14 +4,14 @@
 #include "hypatiaINC.h"
 #include "types.h"
 
-CFLOAT util_ldClamp(CFLOAT c, CFLOAT lower, CFLOAT upper);
+extern CFLOAT util_floatClamp(CFLOAT c, CFLOAT lower, CFLOAT upper);
 
 // not in use
 // int randomRange(int lower, int upper);
 
 
-vec3 util_randomInUnitSphere();
-CFLOAT util_randomLD(CFLOAT lower, CFLOAT upper);
+extern vec3 util_randomUnitSphere();
+extern CFLOAT util_randomFloat(CFLOAT lower, CFLOAT upper);
 
 #endif
 
