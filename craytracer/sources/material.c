@@ -8,7 +8,6 @@
 static bool mat_metalScatter(const MetalMat * restrict nmetalMat, const Ray * restrict rayIn, const HitRecord * restrict rec, vec3 * restrict attenuation, Ray * restrict out){
     
     vec3 direction = rayIn->direction;
-    vector3_normalize(&direction);
         
     vec3 reflected = util_vec3Reflect(direction, rec->normal);
 

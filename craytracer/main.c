@@ -52,23 +52,23 @@ HitRecord* hittableList(int n, Sphere *sphere[n], Ray ray, CFLOAT t_min, CFLOAT 
 }
 
 vec3 ray_c(Ray r, int n, Sphere* sphere[n], int depth){
-    vec3 vertex;
-    if(depth <= 0)
-        return *(vector3_zero(&vertex));
-    
+    if(depth <= 0){
+        return (vec3){0};
+    }
+
     HitRecord *  rec = hittableList(n, sphere, r, 0.1, FLT_MAX);
     if(rec != NULL){
         Ray scattered = {0};
         vec3 attenuation = {0};
         
         if(mat_scatter(&r, rec, &attenuation, &scattered)){
-            vec3 color = ray_c(r, n, sphere, depth - 1);
+            vec3 color = ray_c(scattered, n, sphere, depth - 1);
             vector3_multiply(&color, &attenuation);
             
             return color;
         }
 
-        return (vec3){.x = 0, .y = 0, .z = 0};
+        return (vec3){0};
     }
 
     vec3 ud = r.direction;
