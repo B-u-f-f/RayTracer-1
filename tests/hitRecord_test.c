@@ -9,7 +9,7 @@
 #include "hitRecord.h"
 #include "types.h"
 #include "testutils.h"
-
+#include "material.h"
 
 START_TEST(check_hr_1){
     vec3 point = {
@@ -29,15 +29,17 @@ START_TEST(check_hr_1){
         .y = 3.0,
         .z = 10.0
     };
-        
-    HitRecord temp_hr_1 = hr_setRecord(4.0, point, normal, direction);
+    
+    Material m;
+
+    HitRecord temp_hr_1 = hr_setRecord(4.0, point, normal, direction, &m);
     
     ck_assert_ld_vec3_eq(point, temp_hr_1.point);
     ck_assert_ld_vec3_eq(normal, temp_hr_1.normal);
     ck_assert_int_eq(1, temp_hr_1.frontFace);
     ck_float_equal(4.0, temp_hr_1.distanceFromOrigin);
     ck_assert_int_eq(1, temp_hr_1.valid);
-    
+    ck_assert_ptr_eq(temp_hr_1.hitObjMat, &m);
 }
 END_TEST
 
@@ -60,7 +62,8 @@ START_TEST(check_hr_2){
         .z = -4.0
     };
 
-    HitRecord t_hr = hr_setRecord(7.0, p, n, d);
+    Material m;
+    HitRecord t_hr = hr_setRecord(7.0, p, n, d, &m);
 
     vec3 ne_n = {
         .x = 4.0,
@@ -73,6 +76,7 @@ START_TEST(check_hr_2){
     ck_float_equal(7.0, t_hr.distanceFromOrigin);
     ck_assert_int_eq(0, t_hr.frontFace);
     ck_assert_int_eq(1, t_hr.valid);
+    ck_assert_ptr_eq(t_hr.hitObjMat, &m);
 }
 END_TEST
 

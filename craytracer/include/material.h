@@ -27,6 +27,6 @@ typedef struct material {
 } Material;
 
 
-bool mat_scatter (const Material * restrict m, const Ray * restrict rayIn, const HitRecord * restrict rec, const vec3 * restrict color, Ray * restrict out);
+bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, vec3 * restrict attenuation, Ray * restrict out);
 
 #endif

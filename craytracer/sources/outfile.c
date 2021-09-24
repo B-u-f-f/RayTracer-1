@@ -9,7 +9,7 @@ void writeToPPM(const char * filename, int width, int height,
     FILE *fptr = fopen(filename, "w");
     
     if(fptr == NULL){
-        printf("ERROR!");
+        printf("ERROR: File not found.\n");
         exit(1);
     }
 

@@ -5,7 +5,7 @@
 #include "ray.h"
 
 
-static bool mat_metalScatter(const MetalMat * restrict nmetalMat, const Ray * restrict rayIn, const HitRecord * restrict rec, const vec3 * restrict color, Ray * restrict out){
+static bool mat_metalScatter(const MetalMat * restrict nmetalMat, const Ray * restrict rayIn, const HitRecord * restrict rec, vec3 * restrict attenuation, Ray * restrict out){
     
     vec3 direction = rayIn->direction;
     vector3_normalize(&direction);
@@ -14,14 +14,14 @@ static bool mat_metalScatter(const MetalMat * restrict nmetalMat, const Ray * re
 
     *out = ray_create(rec->point, reflected);
 
-    *color = nmetalMat->albedo;
+    *attenuation = nmetalMat->albedo;
 
-    int dot_prod = vector3_dot_product(out->direction, rec->normal);
+    int dot_prod = vector3_dot_product(&out->direction, &rec->normal);
 
     return (dot_prod > 0);
 }
 
-static bool mat_lambScatter(const LambertianMat * restrict nlambMat, const Ray * restrict rayIn, const HitRecord * restrict rec, const vec3 * restrict color, Ray * restrict out){
+static bool mat_lambScatter(const LambertianMat * restrict nlambMat, const HitRecord * restrict rec, vec3 * restrict attenuation, Ray * restrict out){
     
     vec3 scatter_direction = rec->normal;
     vec3 rndm = util_randomUnitVector();
@@ -34,19 +34,20 @@ static bool mat_lambScatter(const LambertianMat * restrict nlambMat, const Ray *
 
     *out = ray_create(rec->point,scatter_direction);
 
-    *color = nlambMat->albedo;
+    *attenuation = nlambMat->albedo;
 
     return true;
 }
 
 
-bool mat_scatter (const Material * restrict m, const Ray * restrict rayIn, const HitRecord * restrict rec, const vec3 * restrict color, Ray * restrict out){
-    
-    if(mat->matType == METAL){
-        return mat_metalScatter((MetalMat * ) m->mat, rayIn, rec, color, out);
-    }else if (mat->matType == LAMBERTIAN){
-        return mat_lambScatter((LambertianMat * ) m->mat, rayIn, rec, color, out);
+bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, vec3 * restrict attenuation, Ray * restrict out){
+    const Material * restrict m = rec->hitObjMat;
+
+    if(m->matType == METAL){
+        return mat_metalScatter((MetalMat * ) m->mat, rayIn, rec, attenuation, out);
+    }else if (m->matType == LAMBERTIAN){
+        return mat_lambScatter((LambertianMat * ) m->mat, rec, attenuation, out);
     }
 
-    assert();
+    assert(0);
 }

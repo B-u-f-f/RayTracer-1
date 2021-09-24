@@ -5,7 +5,8 @@
 
 #include "hypatiaINC.h"
 #include "types.h"
-#include "material.h"
+
+typedef struct material Material;
 
 typedef struct {
     // intersection point of ray and sphere
@@ -29,8 +30,20 @@ typedef struct {
 } HitRecord;
 
 // construct a hit record object and return it
-extern HitRecord hr_setRecord(CFLOAT distanceFromOrigin, vec3 point, vec3 normal, vec3 direction, const Material * restrict hitObjMat);
-extern void hr_setRecordi(CFLOAT distanceFromOrigin, vec3 point, vec3 normal, vec3 direction, HitRecord* outRecord, const Material * restrict hitObjMat);
+extern HitRecord hr_setRecord(
+            CFLOAT distanceFromOrigin, 
+            vec3 point, 
+            vec3 normal, 
+            vec3 direction, 
+            const Material * restrict hitObjMat
+        );
+extern void hr_setRecordi(
+            CFLOAT distanceFromOrigin, 
+            vec3 point, 
+            vec3 normal, 
+            vec3 direction, HitRecord* outRecord,
+            const Material * restrict hitObjMat
+        );
 
 #endif
 

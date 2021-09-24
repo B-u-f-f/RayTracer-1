@@ -71,7 +71,7 @@ HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
     vector3_multiplyf(&n, 1/s.radius);
     
     HitRecord * outRecord = (HitRecord *) malloc(sizeof(HitRecord));
-    hr_setRecordi(t, p, n, direction, outRecord, s.sphMat);
+    hr_setRecordi(t, p, n, direction, outRecord, &s.sphMat);
     return outRecord;
 }
 

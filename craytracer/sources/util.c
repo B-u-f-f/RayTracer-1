@@ -89,13 +89,13 @@ vec3 util_randomUnitVector(){
 }
 
 vec3 util_vec3Reflect(vec3 v,vec3 n){
-    CFLOAT two_dot_product = 2*vector3_dot_product(v,n);
+    CFLOAT two_dot_product = 2*vector3_dot_product(&v, &n);
     vector3_multiplyf(&n, two_dot_product);
     vector3_subtract(&v,&n);
     return v;
 }
 
-#define float_zero(a) nearly_equal(a, 128 * F_EPSILON, F_MIN)
+#define float_zero(a) nearly_zero(a, 128 * F_EPSILON, F_MIN)
 
 bool util_isVec3Zero(vec3 v){
     return (float_zero(v.x)) && (float_zero(v.y)) && (float_zero(v.z));

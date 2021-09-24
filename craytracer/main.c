@@ -58,22 +58,17 @@ vec3 ray_c(Ray r, int n, Sphere* sphere[n], int depth){
     
     HitRecord *  rec = hittableList(n, sphere, r, 0.1, FLT_MAX);
     if(rec != NULL){
-        vec3 target = rec->point;
-        vector3_add(&target, &rec->normal);
-        vec3 randUnitVec = util_randomUnitVector();
-        vector3_add(&target, &randUnitVec);
-        vec3 inter2 = target;
-        vector3_subtract(&inter2, &rec->point);
+        Ray scattered = {0};
+        vec3 attenuation = {0};
         
-        Ray r_t = {
-            .origin = rec->point,
-            .direction = inter2
-        };
+        if(mat_scatter(&r, rec, &attenuation, &scattered)){
+            vec3 color = ray_c(r, n, sphere, depth - 1);
+            vector3_multiply(&color, &attenuation);
+            
+            return color;
+        }
 
-        vec3 inter1 = ray_c(r_t, n, sphere, depth - 1);
-        vector3_multiplyf(&inter1, 0.5);
-
-        return inter1;
+        return (vec3){.x = 0, .y = 0, .z = 0};
     }
 
     vec3 ud = r.direction;
@@ -120,7 +115,7 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 16.0 / 9.0;
-    const int WIDTH = 500;
+    const int WIDTH = 250;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
@@ -129,30 +124,30 @@ int main(int argc, char *argv[]){
 
     LambertianMat materialGround = {
         .albedo = {
-            .r = 0.8,
-            .g = 0.8, 
-            .b = 0.0
+            .x = 0.8,
+            .y = 0.8, 
+            .z = 0.0
         }
     };
     LambertianMat materialCenter = {
         .albedo = {
-            .r = 0.7,
-            .g = 0.3,
-            .b = 0.3
+            .x = 0.7,
+            .y = 0.3,
+            .z = 0.3
         }
     }; 
     MetalMat materialLeft = {
         .albedo = {
-            .r = 0.8,
-            .g = 0.8, 
-            .b = 0.8
+            .x = 0.8,
+            .y = 0.8, 
+            .z = 0.8
         }
     };
-    MetalMat materialRight {
+    MetalMat materialRight = {
         .albedo = {
-            .r = 0.8,
-            .g = 0.6,
-            .b = 0.2
+            .x = 0.8,
+            .y = 0.6,
+            .z = 0.2
         }
     }; 
 

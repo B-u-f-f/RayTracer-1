@@ -6,6 +6,8 @@
 #include <time.h>
 #include "util.h"
 
+#include "testutils.h"
+
 START_TEST(check_util_h_1){
     ck_assert_float_eq(util_floatClamp(8.9L, 6.0L, 8.0L), 8.0L);
 }
@@ -75,31 +77,31 @@ START_TEST(check_util_h_7){
         .x = 1.0,
         .y = 2.0,
         .z = 3.0
-    }
+    };
     
     vec3 n = {
         .x = 4.0,
         .y = 5.0,
         .z = 6.0
-    }
+    };
 
     vec3 expected = {
         .x = -255.0,
         .y = -318.0,
         .z = -381.0
-    }
+    };
 
-    ck_assert_ld_vec3_eq(expected, util_vec3Reflect(v,n));
+    ck_assert_ld_vec3_eq(expected, util_vec3Reflect(v, n));
 
 }END_TEST
 
 START_TEST(check_util_near_zero_corr){
-    bool b = util_isVec3Zero({.x = 0.0, .y = 0.0, .z = 0.0});
+    bool b = util_isVec3Zero((vec3){.x = 0.0, .y = 0.0, .z = 0.0});
     ck_assert_int_eq(b, 1);
 }END_TEST
 
 START_TEST(check_util_near_zero_incorr){
-    bool b = util_isVec3Zero({.x = 1.0, .y = 0.0, .z = 0.0});
+    bool b = util_isVec3Zero((vec3){.x = 1.0, .y = 0.0, .z = 0.0});
     ck_assert_int_eq(b, 0);
 }END_TEST
 

@@ -1,14 +1,15 @@
-#include<stdlib.h>
-#include<stdbool.h>
-
 #define HYPATIA_IMPLEMENTATION
+#include <stdlib.h>
+#include <stdbool.h>
+#include <tgmath.h>
+#include <check.h>
 
 #include "hypatiaINC.h"
 #include "material.h"
-#include <tgmath.h>
 #include "hitRecord.h"
 
 START_TEST(check_material_1){
+/*
     LambertianMat t_lmat = {
         .albedo = {
             .x = 1.0,
@@ -74,11 +75,13 @@ START_TEST(check_material_1){
         
     };
 
+*/
 
-
-}END_TEST
+}
+END_TEST
 
 START_TEST (check_material_2){
+/*
     MetalMat nmetalMat = {
         .albedo = {
             .x = 1.0,
@@ -123,7 +126,7 @@ START_TEST (check_material_2){
         .hitObjMat = {
             .mat = NULL,
 
-            matType = METAL
+            .matType = METAL
         }
     };
 
@@ -148,7 +151,7 @@ START_TEST (check_material_2){
     };
 
     bool ans = mat_metalScatter(&nmetalMat, &rayIn, &rec, &color, &out);
-
+*/
 }END_TEST
 
 
@@ -161,14 +164,14 @@ Suite* util_suite(void)
 
     //Core test case
     tc_core = tcase_create("Core");
-
     suite_add_tcase(s, tc_core);
+    tcase_add_test(tc_core, check_material_1);
+    tcase_add_test(tc_core, check_material_2);
 
     return s;
 }
 
 int main(void){
-    srand(time(NULL));
 
     int number_failed;
     Suite* s;
