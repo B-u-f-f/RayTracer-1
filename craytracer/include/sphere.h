@@ -8,6 +8,7 @@
 
 #include "types.h"
 #include "ray.h"
+#include "material.h"
 
 typedef struct {
     // center of the sphere
@@ -15,6 +16,9 @@ typedef struct {
 
     // radius of the sphere
     CFLOAT radius;
+
+    //material
+    Material sphMat;
 } Sphere;
 
 extern HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max);

@@ -15,6 +15,7 @@
 #include "types.h"
 #include "hypatiaINC.h"
 #include "ray.h"
+#include "material.h"
 
 vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     CFLOAT r = pixel_color.x;
@@ -59,8 +60,8 @@ vec3 ray_c(Ray r, int n, Sphere* sphere[n], int depth){
     if(rec != NULL){
         vec3 target = rec->point;
         vector3_add(&target, &rec->normal);
-        vec3 rand = util_randomUnitSphere();
-        vector3_add(&target, &rand);
+        vec3 randUnitVec = util_randomUnitVector();
+        vector3_add(&target, &randUnitVec);
         vec3 inter2 = target;
         vector3_subtract(&inter2, &rec->point);
         
@@ -119,15 +120,44 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 16.0 / 9.0;
-    const int WIDTH = 1000;
+    const int WIDTH = 500;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
     
     vec3* image = (vec3*) malloc(sizeof(vec3) * HEIGHT * WIDTH);
-    
 
-    Sphere * s[2];
+    LambertianMat materialGround = {
+        .albedo = {
+            .r = 0.8,
+            .g = 0.8, 
+            .b = 0.0
+        }
+    };
+    LambertianMat materialCenter = {
+        .albedo = {
+            .r = 0.7,
+            .g = 0.3,
+            .b = 0.3
+        }
+    }; 
+    MetalMat materialLeft = {
+        .albedo = {
+            .r = 0.8,
+            .g = 0.8, 
+            .b = 0.8
+        }
+    };
+    MetalMat materialRight {
+        .albedo = {
+            .r = 0.8,
+            .g = 0.6,
+            .b = 0.2
+        }
+    }; 
+
+
+    Sphere * s[4];
     
     Sphere s1 = {
         .center = {
@@ -135,23 +165,55 @@ int main(int argc, char *argv[]){
             .y = -100.5,
             .z = -1.0
         },
-
-        .radius = 100
+        .radius = 100,
+        .sphMat = {
+            .mat = &materialGround,
+            .matType = LAMBERTIAN
+        },
     };
-    
     Sphere s2 = {
         .center = {
             .x = 0.0, 
             .y = 0.0,
             .z = -1.0
         },
-
-        .radius = 0.5
+        .radius = 0.5,
+        .sphMat = {
+            .mat = &materialCenter,
+            .matType = LAMBERTIAN,
+        },
+    };
+    Sphere s3 = {
+        .center = {
+            .x = -1.0, 
+            .y = 0.0,
+            .z = -1.0
+        },
+        .radius = 0.5,
+        .sphMat = {
+            .mat = &materialLeft,
+            .matType = METAL,
+        },
+    };
+    Sphere s4 = {
+        .center = {
+            .x = 1.0, 
+            .y = 0.0,
+            .z = -1.0
+        },
+        
+        .radius = 0.5,
+        .sphMat = {
+            .mat = &materialRight,
+            .matType = METAL,
+        },
     };
 
 
     s[0] = &s1;
     s[1] = &s2;
+    s[2] = &s3;
+    s[3] = &s4;
 
    Camera c = {
         .origin = {

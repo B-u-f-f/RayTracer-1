@@ -19,7 +19,7 @@
 } \
 
 
-bool nearly_equal(CFLOAT a, CFLOAT b, CFLOAT epsilon, CFLOAT abs_th){
+extern bool nearly_equal(CFLOAT a, CFLOAT b, CFLOAT epsilon, CFLOAT abs_th){
     assert(F_EPSILON <= epsilon);
     assert(epsilon < 1.0);
 

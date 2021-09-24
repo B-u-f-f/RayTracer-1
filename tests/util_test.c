@@ -51,6 +51,59 @@ START_TEST(check_util_h_5){
 
 }END_TEST
 
+START_TEST(check_util_h_6){
+
+    vec3 t = util_randomUnitVector();
+
+    ck_assert_ldouble_lt(t.x, 1.0L);
+    ck_assert_ldouble_ge(t.x, 0.0L);
+
+    ck_assert_ldouble_lt(t.y, 1.0L);
+    ck_assert_ldouble_ge(t.y, 0.0L);
+
+    ck_assert_ldouble_lt(t.z, 1.0L);
+    ck_assert_ldouble_ge(t.z, 0.0L);
+
+    int sq = t.x*t.x + t.y*t.y + t.z*t.z;
+
+    ck_float_equal(sq, 1.0);
+
+}END_TEST
+
+START_TEST(check_util_h_7){
+    vec3 v = {
+        .x = 1.0,
+        .y = 2.0,
+        .z = 3.0
+    }
+    
+    vec3 n = {
+        .x = 4.0,
+        .y = 5.0,
+        .z = 6.0
+    }
+
+    vec3 expected = {
+        .x = -255.0,
+        .y = -318.0,
+        .z = -381.0
+    }
+
+    ck_assert_ld_vec3_eq(expected, util_vec3Reflect(v,n));
+
+}END_TEST
+
+START_TEST(check_util_near_zero_corr){
+    bool b = util_isVec3Zero({.x = 0.0, .y = 0.0, .z = 0.0});
+    ck_assert_int_eq(b, 1);
+}END_TEST
+
+START_TEST(check_util_near_zero_incorr){
+    bool b = util_isVec3Zero({.x = 1.0, .y = 0.0, .z = 0.0});
+    ck_assert_int_eq(b, 0);
+}END_TEST
+
+
 Suite* util_suite(void)
 {
     Suite *s;
@@ -66,6 +119,11 @@ Suite* util_suite(void)
     tcase_add_test(tc_core, check_util_h_3);
     tcase_add_test(tc_core, check_util_h_4);
     tcase_add_test(tc_core, check_util_h_5);
+    tcase_add_test(tc_core, check_util_h_6);
+    tcase_add_test(tc_core, check_util_h_7);
+    tcase_add_test(tc_core, check_util_near_zero_corr);
+    tcase_add_test(tc_core, check_util_near_zero_incorr);
+
     suite_add_tcase(s, tc_core);
 
     return s;
