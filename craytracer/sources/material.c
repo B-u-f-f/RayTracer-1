@@ -16,7 +16,7 @@ static bool mat_metalScatter(const MetalMat * restrict nmetalMat, const Ray * re
 
     *attenuation = nmetalMat->albedo;
 
-    int dot_prod = vector3_dot_product(&out->direction, &rec->normal);
+    CFLOAT dot_prod = vector3_dot_product(&out->direction, &rec->normal);
 
     return (dot_prod > 0);
 }

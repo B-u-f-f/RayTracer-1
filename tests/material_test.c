@@ -9,7 +9,6 @@
 #include "hitRecord.h"
 
 START_TEST(check_material_1){
-/*
     LambertianMat t_lmat = {
         .albedo = {
             .x = 1.0,
@@ -18,18 +17,18 @@ START_TEST(check_material_1){
         }
     };
 
-    Ray t_rayIn = {
+    Ray rayIn = {
         .origin = {
-            .x = 0.0,
-            .y = 0.0,
-            .z = 0.0
+            .x = 0,
+            .y = 0,
+            .z = 0
         },
+
         .direction = {
             .x = -2.0,
             .y = -3.0,
             .z = -2.0
         }
-       
     };
 
     HitRecord t_hr =  {
@@ -49,7 +48,7 @@ START_TEST(check_material_1){
         .valid = true,
 
         .hitObjMat = {
-            .mat = NULL,
+            .mat = &t_lmat,
             .matType = LAMBERTIAN
         }  
         
@@ -69,19 +68,43 @@ START_TEST(check_material_1){
         },
         .direction = {
             .x = 0,
-            .y = 0,
+            .y attenua= 0,
             .z = 0
         }
         
     };
 
-*/
+    vec3 attenuation = {
+        .x = 0.0,
+        .y = 0.0,
+        .z = 0.0
+    };
+
+    
+    bool b = mat_scatter(rayIn,t_hr,attenuation,out);
+
+    scattered_direction = {
+        .x = -1.0,
+        .y = 3.0,
+        .z = 2.0
+    };
+
+    ck_assert_ldouble_le(scattered_direction.x,0.0);
+    ck_assert_ldouble_ge(scattered_direction.x,-1.0);
+    ck_assert_ldouble_le(scattered_direction.y,4.0);
+    ck_assert_ldouble_ge(scattered_direction.y,3.0);
+    ck_assert_ldouble_le(scattered_direction.z,3.0);
+    ck_assert_ldouble_ge(scattered_direction.z,2.0);
+
+    Ray temp = ray_create()
+
+    
 
 }
 END_TEST
 
-START_TEST (check_material_2){
-/*
+START_TEST (check_material_metal_false){
+
     MetalMat nmetalMat = {
         .albedo = {
             .x = 1.0,
@@ -124,13 +147,12 @@ START_TEST (check_material_2){
         .valid = true,
 
         .hitObjMat = {
-            .mat = NULL,
-
+            .mat = &nmetalMat,
             .matType = METAL
         }
     };
 
-    vec3 color = {
+    vec3 attenuation = {
         .x = 0,
         .y = 0,
         .z = 0
@@ -150,8 +172,34 @@ START_TEST (check_material_2){
         }
     };
 
-    bool ans = mat_metalScatter(&nmetalMat, &rayIn, &rec, &color, &out);
-*/
+    Ray exp_out = {
+
+        .origin = {
+            .x = 4.0,
+            .y = 3.0, 
+            .z = 2.0 
+        },
+
+        .direction = {
+            .x = -0.47058824,
+            .y = 0.88235294,
+            .z = 0.58823529
+        }
+
+    };
+
+    vec3 exp_attenuation = {
+        .x = 1.0,
+        .y = 2.0,
+        .z = 3.0
+    }
+
+
+    bool b = mat_scatter(&rayIn, &rec, &attenuation, &out);
+    
+    ck_assert_ld_vec3_eq(exp_attenuation, attenuation);
+
+
 }END_TEST
 
 
@@ -172,6 +220,7 @@ Suite* util_suite(void)
 }
 
 int main(void){
+    srand(1);
 
     int number_failed;
     Suite* s;
