@@ -66,7 +66,7 @@ START_TEST(check_util_h_6){
     ck_assert_ldouble_lt(t.z, 1.0L);
     ck_assert_ldouble_ge(t.z, 0.0L);
 
-    int sq = t.x*t.x + t.y*t.y + t.z*t.z;
+    CFLOAT sq = t.x * t.x + t.y * t.y + t.z * t.z;
 
     ck_float_equal(sq, 1.0);
 

@@ -72,7 +72,7 @@ vec3 util_randomUnitVector(){
         y = util_randomFloat(0.0, 1.0);
         z = util_randomFloat(0.0, 1.0);
 
-        if(x*x + y*y + z*z >= 1){
+        if(x*x + y*y + z*z > 1){
             continue;
         }else{
             break;
