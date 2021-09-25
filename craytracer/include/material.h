@@ -22,7 +22,8 @@ typedef enum materialType {
 } MaterialType;
 
 typedef struct material {
-    const void * mat;
+    const MetalMat * matMetal;
+    const LambertianMat * matLamb;
     MaterialType matType;
 } Material;
 

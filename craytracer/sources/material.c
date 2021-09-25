@@ -48,9 +48,9 @@ bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, ve
     const Material * restrict m = rec->hitObjMat;
 
     if(m->matType == METAL){
-        return mat_metalScatter((MetalMat * ) m->mat, rayIn, rec, attenuation, out);
+        return mat_metalScatter((MetalMat * ) m->matMetal, rayIn, rec, attenuation, out);
     }else if (m->matType == LAMBERTIAN){
-        return mat_lambScatter((LambertianMat * ) m->mat, rec, attenuation, out);
+        return mat_lambScatter((LambertianMat * ) m->matLamb, rec, attenuation, out);
     }
 
     assert(0);

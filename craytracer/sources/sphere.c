@@ -1,7 +1,7 @@
 #include "sphere.h"
 #include <tgmath.h>
 
-HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
+HitRecord* hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max){
     vec3 oc = r.origin;
     vec3 direction = r.direction;
 
@@ -12,7 +12,7 @@ HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
      */
 
     // oc = origin - center
-    vector3_subtract(&oc, &s.center);
+    vector3_subtract(&oc, &s->center);
 
     // a = dot(direction, direction)
     CFLOAT a = vector3_dot_product(&direction, &direction);
@@ -21,7 +21,7 @@ HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
     CFLOAT half_b = vector3_dot_product(&oc, &direction);
     
     // c = dot(origin, origin) - radius^2
-    CFLOAT c = vector3_dot_product(&oc, &oc) - s.radius * s.radius;
+    CFLOAT c = vector3_dot_product(&oc, &oc) - s->radius * s->radius;
 
     // discri = half_b^2 - a * c
     CFLOAT discri = half_b * half_b - a*c;
@@ -65,13 +65,13 @@ HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max){
     vec3 n = p;
     
     // n = p - center
-    vector3_subtract(&n, &s.center);
+    vector3_subtract(&n, &s->center);
     
     // n = (p - center)/radius
-    vector3_multiplyf(&n, 1/s.radius);
+    vector3_multiplyf(&n, 1/s->radius);
     
     HitRecord * outRecord = (HitRecord *) malloc(sizeof(HitRecord));
-    hr_setRecordi(t, p, n, direction, outRecord, &s.sphMat);
+    hr_setRecordi(t, p, n, direction, outRecord, &s->sphMat);
     return outRecord;
 }
 

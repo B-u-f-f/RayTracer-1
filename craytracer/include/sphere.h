@@ -21,7 +21,7 @@ typedef struct {
     Material sphMat;
 } Sphere;
 
-extern HitRecord* hit(Sphere s, Ray r, CFLOAT t_min, CFLOAT t_max);
+extern HitRecord* hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max);
 
 #endif
 

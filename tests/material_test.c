@@ -34,7 +34,7 @@ START_TEST(check_material_lambertian){
     };
 
     Material ma = {
-        .mat = &t_lmat,
+        .matLamb = &t_lmat,
         .matType = LAMBERTIAN,
     };
 
@@ -138,7 +138,7 @@ START_TEST (check_material_metal_true){
     // 0.1980295085953345561950357848837
     
     Material ma = {
-            .mat = &nmetalMat,
+            .matMetal = &nmetalMat,
             .matType = METAL
     };
 
@@ -243,7 +243,7 @@ START_TEST (check_material_metal_false) {
     // normalized = (0.323380833381777, 0.88929729179989, 0.323380833381777)
 
     Material ma = {
-        .mat = &nmetalMat,
+        .matMetal = &nmetalMat,
         .matType = METAL
     };
 

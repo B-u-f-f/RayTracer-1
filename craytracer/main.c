@@ -37,12 +37,12 @@ vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     return temp;
 }
 
-HitRecord* hittableList(int n, Sphere *sphere[n], Ray ray, CFLOAT t_min, CFLOAT t_max){
+HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, CFLOAT t_min, CFLOAT t_max){
     HitRecord * r = NULL;
     HitRecord * h = NULL;
 
     for(int i = 0; i < n; i++){
-        r = hit(*sphere[i], ray, t_min, t_max);
+        r = hit(&sphere[i], ray, t_min, t_max);
 
         if(r != NULL){
             h = r;
@@ -51,7 +51,7 @@ HitRecord* hittableList(int n, Sphere *sphere[n], Ray ray, CFLOAT t_min, CFLOAT 
     return h;
 }
 
-vec3 ray_c(Ray r, int n, Sphere* sphere[n], int depth){
+vec3 ray_c(Ray r, int n, Sphere sphere[n], int depth){
     if(depth <= 0){
         return (vec3){0};
     }
@@ -138,61 +138,35 @@ int main(int argc, char *argv[]){
     }; 
 
 
-    Sphere * s[4];
-    
-    Sphere s1 = {
+    Sphere  s[4] = {
+        {
         .center = { .x = 0.0, .y = -100.5, .z = -1.0},
         .radius = 100,
-        .sphMat = {
-            .mat = &materialGround,
-            .matType = LAMBERTIAN
-        },
-    };
-    Sphere s2 = {
-        .center = {
-            .x = 0.0, 
-            .y = 0.0,
-            .z = -1.0
-        },
-        .radius = 0.5,
-        .sphMat = {
-            .mat = &materialCenter,
-            .matType = LAMBERTIAN,
-        },
-    };
-    Sphere s3 = {
-        .center = {
-            .x = -1.0, 
-            .y = 0.0,
-            .z = -1.0
-        },
-        .radius = 0.5,
-        .sphMat = {
-            .mat = &materialLeft,
-            .matType = METAL,
-        },
-    };
-    Sphere s4 = {
-        .center = {
-            .x = 1.0, 
-            .y = 0.0,
-            .z = -1.0
+        .sphMat = {.matLamb = &materialGround, .matType = LAMBERTIAN },
         },
         
+        {
+        .center = {.x = 0.0, .y = 0.0, .z = -1.0},
         .radius = 0.5,
-        .sphMat = {
-            .mat = &materialRight,
-            .matType = METAL,
+        .sphMat = {.matLamb = &materialCenter, .matType = LAMBERTIAN },
         },
+
+        
+        {
+        .center = {.x = -1.0, .y = 0.0, .z = -1.0},
+        .radius = 0.5,
+        .sphMat = {.matMetal = &materialLeft, .matType = METAL},
+        },
+        
+        {
+        .center = {.x = 1.0, .y = 0.0, .z = -1.0},
+        
+        .radius = 0.5,
+        .sphMat = {.matMetal = &materialRight, .matType = METAL},
+        }
     };
-
-
-    s[0] = &s1;
-    s[1] = &s2;
-    s[2] = &s3;
-    s[3] = &s4;
-
-   Camera c = {
+    
+    Camera c = {
         .origin = {
             .x = 0.0,
             .y = 0.0
