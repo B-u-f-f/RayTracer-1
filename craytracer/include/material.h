@@ -10,6 +10,7 @@
 
 typedef struct metalMat {
     vec3 albedo;
+    CFLOAT fuzz;
 } MetalMat;
 
 typedef struct lambertianMat {

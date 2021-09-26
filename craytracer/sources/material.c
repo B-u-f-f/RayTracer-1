@@ -14,7 +14,17 @@ static bool mat_metalScatter(const MetalMat * restrict nmetalMat,
         
     vec3 reflected = util_vec3Reflect(direction, rec->normal);
 
-    *out = ray_create(rec->point, reflected);
+    vec3 fuzz_rndm = util_randomUnitSphere();
+
+    CFLOAT fuzz = nmetalMat->fuzz;
+
+    fuzz = util_floatClamp(fuzz, 0, 1.0);
+
+    vector3_multiplyf(&fuzz_rndm, fuzz);
+
+    vector3_add(&fuzz_rndm, &reflected);
+
+    *out = ray_create(rec->point, fuzz_rndm);
 
     *attenuation = nmetalMat->albedo;
 

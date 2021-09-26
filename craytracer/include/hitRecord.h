@@ -17,16 +17,16 @@ typedef struct {
 
     // distance between origin and point
     CFLOAT distanceFromOrigin;
-    
+
+    // pointer to the material of the object
+    const Material * hitObjMat;    
+
     // the surface of the object where ray
     // intersected the object
     bool frontFace;
 
     // true when this structure is valid
     bool valid;
-
-    // pointer to the material of the object
-    const Material * hitObjMat;
 } HitRecord;
 
 // construct a hit record object and return it

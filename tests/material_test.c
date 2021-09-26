@@ -35,6 +35,7 @@ START_TEST(check_material_lambertian){
 
     Material ma = {
         .matLamb = &t_lmat,
+        .matMetal = NULL,
         .matType = LAMBERTIAN,
     };
 
@@ -76,7 +77,7 @@ START_TEST(check_material_lambertian){
         .z = 0.0
     };
 
-    //x = 0.37963565706642355, y = 0.87001058857811875, z = 0.31457645119382399
+    //random_numbers = x = 0.37963565706642355, y = 0.87001058857811875, z = 0.31457645119382399
     
     bool b = mat_scatter(&rayIn, &t_hr, &attenuation, &out);
 
@@ -109,12 +110,15 @@ END_TEST
 
 START_TEST (check_material_metal_true){
 
+    
+
     MetalMat nmetalMat = {
         .albedo = {
             .x = 1.0,
             .y = 2.0,
             .z = 3.0
-        }
+        },
+        .fuzz = 0.2
     };
 
     Ray rayIn = {
@@ -136,8 +140,16 @@ START_TEST (check_material_metal_true){
     // d - n = (-0.6467616667635545, -0.404226041727222, -0.6467616667635545)
     
     // 0.1980295085953345561950357848837
+
+    // cnst rndm_nbrs = {0.33522275571488902, 0.768229594811904, 0.27777471080318777}
+    
+
+    // fuzz * rndm = {0.067044551142977804, 0.1536459189623808, 0.055554942160637554}
+    // above + reflected = (-0.5797171156205767, -0.250580122764841, -0.5912067246029169)
+    // nrml = (-0.670120332634210, -0.289656507793361, -0.683401673456519)
     
     Material ma = {
+            .matLamb = NULL,
             .matMetal = &nmetalMat,
             .matType = METAL
     };
@@ -189,11 +201,10 @@ START_TEST (check_material_metal_true){
             .y = 3.0, 
             .z = 2.0 
         },
-
         .direction = {
-            .x = -0.6467616667635545,
-            .y = -0.404226041727222,
-            .z = -0.6467616667635545
+            .x = -0.670120332634210,
+            .y = -0.289656507793361,
+            .z = -0.683401673456519
         }
     };
 
@@ -211,6 +222,7 @@ START_TEST (check_material_metal_true){
     ck_assert_ld_vec3_eq(exp_out.direction, out.direction);
     ck_assert_int_eq(1, b);
 
+
 }END_TEST
 
 START_TEST (check_material_metal_false) {
@@ -220,7 +232,8 @@ START_TEST (check_material_metal_false) {
             .x = 1.0,
             .y = 2.0,
             .z = 3.0
-        }
+        },
+        .fuzz = 0.3
     };
 
     Ray rayIn = {
@@ -239,10 +252,16 @@ START_TEST (check_material_metal_false) {
 
     // 2*dot_prod = 1.980295085953348833406939841573836
     // n * 2_dot_prod = {-0.8084520834544435, -1.616904166908887, -0.8084520834544435}
-    // (0.3233808333817776, 0.889297291799888, 0.3233808333817776)
+    // d - n = (0.3233808333817776, 0.889297291799888, 0.3233808333817776)
     // normalized = (0.323380833381777, 0.88929729179989, 0.323380833381777)
 
+    // cnst rndm_nbrs = {0.33522275571488902, 0.768229594811904, 0.27777471080318777}
+    // fuzz*rndm = {0.100566826714466706, 0.2304688784435712, 0.083332413240956331}
+    // above + reflected = (0.423947660096244, 1.11976617024346, 0.406713246622733)
+    // nrml = (0.335262370437306, 0.88552313388426, 0.321633210854460)
+
     Material ma = {
+        .matLamb = NULL,
         .matMetal = &nmetalMat,
         .matType = METAL
     };
@@ -295,9 +314,9 @@ START_TEST (check_material_metal_false) {
         },
 
         .direction = {
-            .x = 0.323380833381777,
-            .y = 0.88929729179989,
-            .z = 0.323380833381777
+            .x = 0.335262370437306,
+            .y = 0.88552313388426,
+            .z = 0.321633210854460
         }
     };
 

@@ -14,11 +14,11 @@ typedef struct {
     // center of the sphere
     vec3 center;
 
-    // radius of the sphere
-    CFLOAT radius;
-
     //material
     Material sphMat;
+
+    // radius of the sphere
+    CFLOAT radius;
 } Sphere;
 
 extern HitRecord* hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max);

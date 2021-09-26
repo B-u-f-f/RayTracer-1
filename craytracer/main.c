@@ -131,10 +131,12 @@ int main(int argc, char *argv[]){
     }; 
 
     MetalMat materialLeft = {
-        .albedo = {.x = 0.8, .y = 0.8, .z = 0.8}
+        .albedo = {.x = 0.8, .y = 0.8, .z = 0.8},
+        .fuzz = 0.3
     };
     MetalMat materialRight = {
-        .albedo = {.x = 0.8, .y = 0.6,.z = 0.2}
+        .albedo = {.x = 0.8, .y = 0.6,.z = 0.2},
+        .fuzz = 1.0
     }; 
 
 
