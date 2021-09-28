@@ -1,7 +1,7 @@
 #include "sphere.h"
 #include <tgmath.h>
 
-HitRecord* hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max){
+void hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord){
     vec3 oc = r.origin;
     vec3 direction = r.direction;
 
@@ -28,7 +28,8 @@ HitRecord* hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max){
 
     // If the discriminant is less than 0 then no intersection
     if(discri < 0){
-        return NULL;
+        outRecord->valid = false;
+        return;
     }
 
     // sqrtd = sqrt(discri)
@@ -45,8 +46,8 @@ HitRecord* hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max){
         // If neither roots correspond to an intersection point in
         // the intersection range then return invalid
         if(root < t_min || t_max < root){
-            return NULL;
-     
+            outRecord->valid = false; 
+            return;
         }
     }
 
@@ -70,8 +71,6 @@ HitRecord* hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max){
     // n = (p - center)/radius
     vector3_multiplyf(&n, 1/s->radius);
     
-    HitRecord * outRecord = (HitRecord *) malloc(sizeof(HitRecord));
     hr_setRecordi(t, p, n, direction, outRecord, &s->sphMat);
-    return outRecord;
 }
 

@@ -1,7 +1,7 @@
 #include "hitRecord.h"
 #include "material.h"
 
-void hr_setRecordi(CFLOAT distanceFromOrigin, vec3 point, vec3 normal, vec3 direction, HitRecord* outRecord, const Material * restrict hitObjMat){
+void hr_setRecordi(CFLOAT distanceFromOrigin, vec3 point, vec3 normal, vec3 direction, HitRecord* restrict outRecord, const Material * restrict hitObjMat){
     // if temp < 0 then the ray has intersected the object at the front face
     // otherwise it has intersected the object at the back face 
     CFLOAT temp = vector3_dot_product(&direction, &normal);

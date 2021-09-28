@@ -21,7 +21,7 @@ typedef struct {
     CFLOAT radius;
 } Sphere;
 
-extern HitRecord* hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max);
+extern void hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord);
 
 #endif
 
