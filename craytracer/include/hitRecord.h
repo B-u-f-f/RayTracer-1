@@ -41,7 +41,7 @@ extern void hr_setRecordi(
             CFLOAT distanceFromOrigin, 
             vec3 point, 
             vec3 normal, 
-            vec3 direction, HitRecord* outRecord,
+            vec3 direction, HitRecord* restrict outRecord,
             const Material * restrict hitObjMat
         );
 
