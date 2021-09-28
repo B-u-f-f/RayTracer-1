@@ -9,26 +9,32 @@
 #include <stdbool.h>
 
 typedef struct metalMat {
-    vec3 albedo;
+    RGBColorF albedo;
     CFLOAT fuzz;
 } MetalMat;
 
 typedef struct lambertianMat {
-    vec3 albedo;
+    RGBColorF albedo;
 } LambertianMat;
+
+typedef struct dielectricMat {
+    CFLOAT ir;
+} DielectricMat;
 
 typedef enum materialType {
     LAMBERTIAN,
-    METAL
+    METAL,
+    DIELECTRIC
 } MaterialType;
 
 typedef struct material {
     const MetalMat * matMetal;
     const LambertianMat * matLamb;
+    const DielectricMat * matDielectric;
     MaterialType matType;
 } Material;
 
 
-bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, vec3 * restrict attenuation, Ray * restrict out);
+bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, RGBColorF * restrict attenuation, Ray * restrict out);
 
 #endif

@@ -36,6 +36,7 @@ START_TEST(check_material_lambertian){
     Material ma = {
         .matLamb = &t_lmat,
         .matMetal = NULL,
+        .matDielectric = NULL,
         .matType = LAMBERTIAN,
     };
 
@@ -151,6 +152,7 @@ START_TEST (check_material_metal_true){
     Material ma = {
             .matLamb = NULL,
             .matMetal = &nmetalMat,
+            .matDielectric = NULL,
             .matType = METAL
     };
 
@@ -263,6 +265,7 @@ START_TEST (check_material_metal_false) {
     Material ma = {
         .matLamb = NULL,
         .matMetal = &nmetalMat,
+        .matDielectric = NULL,
         .matType = METAL
     };
 
@@ -337,6 +340,116 @@ START_TEST (check_material_metal_false) {
     
 }END_TEST
 
+START_TEST(check_material_dielectric){
+
+    DielectricMat ndielectricMat = {
+        .ir = 1.5
+    };
+
+    Ray rayIn = {
+        .origin = {
+            .x = 0,
+            .y = 0,
+            .z = 0
+        },
+
+        .direction = {
+            .x = -0.48507125007266594,
+            .y = -0.7276068751089989,
+            .z = -0.48507125007266594
+        }
+    };
+
+    Material ma = {
+        .matLamb = NULL,
+        .matMetal = NULL,
+        .matDielectric = &ndielectricMat,
+        .matType = DIELECTRIC
+    };
+
+    HitRecord rec = {
+        .point = {
+            .x = 4.0,
+            .y = 3.0, 
+            .z = 2.0
+        },
+
+        .normal = {
+            .x = -0.4082482904638631,
+            .y = -0.8164965809277261,
+            .z = -0.4082482904638631
+        },
+
+        .distanceFromOrigin = 3.0,
+        .frontFace = false,
+        .valid = true,
+        .hitObjMat = &ma
+    };
+
+    // uv = {-0.48507125007266594, -0.7276068751089989, -0.48507125007266594}
+    // n = {-0.4082482904638631, -0.8164965809277261, -0.4082482904638631}
+    // dot = -0.990147542976674416703469920786918
+    // cos_theta = -0.990147542976674416703469920786918
+    // n * cos_theta = {0.4042260417272217, 0.8084520834544434, 0.4042260417272217}
+    // abv + uv = (-0.0808452083454442, 0.080845208345444, -0.0808452083454442)
+    // abv * et_ea = {-0.1212678125181663, 0.121267812518166, -0.1212678125181663}
+    // length_squared = 0.044117783472
+    // 1 - abv = 0.955882216528
+    // -sqrt = -0.977692291331
+    // abv * n = {0.399141206536, 0.798282413071, 0.399141206536}
+    // r_out_parallel + r_out+perp = (0.27787342249795688, 0.91955028255041327, 0.27787342249795688)
+
+    vec3 attenuation = {
+        .x = 0,
+        .y = 0,
+        .z = 0
+    };
+
+    Ray out = {
+        .origin = {
+            .x = 0,
+            .y = 0,
+            .z = 0
+        },
+
+        .direction = {
+            .x = 1.0,
+            .y = 4.0,
+            .z = 3.0
+        }
+    };
+
+    Ray exp_out = {
+
+        .origin = {
+            .x = 4.0,
+            .y = 3.0, 
+            .z = 2.0 
+        },
+
+        .direction = {
+            .x = 0.27787342249795688,
+            .y = 0.91955028255041327,
+            .z = 0.27787342249795688
+        }
+    };
+
+    vec3 exp_attenuation = {
+        .x = 1.0,
+        .y = 1.0,
+        .z = 1.0
+    };
+
+
+    bool b = mat_scatter(&rayIn, &rec, &attenuation, &out);
+
+    ck_assert_int_eq(1, b);
+    ck_assert_ld_vec3_eq(exp_attenuation, attenuation);
+    ck_assert_ld_vec3_eq(exp_out.origin, out.origin);
+    ck_assert_ld_vec3_eq(exp_out.direction, out.direction);
+
+}END_TEST
+
 Suite* util_suite(void)
 {
     Suite *s;
@@ -349,7 +462,8 @@ Suite* util_suite(void)
     suite_add_tcase(s, tc_core);
     tcase_add_test(tc_core, check_material_lambertian);
     tcase_add_test(tc_core, check_material_metal_true);
-    tcase_add_test(tc_core, check_material_metal_false);    
+    tcase_add_test(tc_core, check_material_metal_false);
+    tcase_add_test(tc_core, check_material_dielectric);
 
     return s;
 }

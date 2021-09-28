@@ -17,10 +17,10 @@
 #include "ray.h"
 #include "material.h"
 
-vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
-    CFLOAT r = pixel_color.x;
-    CFLOAT g = pixel_color.y;
-    CFLOAT b = pixel_color.z;
+RGBColorF writeColor(RGBColorF pixel_color, int sample_per_pixel){
+    CFLOAT r = pixel_color.r;
+    CFLOAT g = pixel_color.g;
+    CFLOAT b = pixel_color.b;
 
     CFLOAT scale = 1.0/sample_per_pixel;
 
@@ -28,11 +28,11 @@ vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     g = sqrt(scale * g);
     b = sqrt(scale * b);
 
-    vec3 temp;
-    
-    vector3_setf3(&temp, 255.999 * util_floatClamp(r,0.0,0.999),
-                         255.999 * util_floatClamp(g,0.0,0.999),
-                         255.999 * util_floatClamp(b,0.0,0.999));
+    RGBColorF temp = {
+        .r = 255.999 * util_floatClamp(r,0.0,0.999),
+        .g = 255.999 * util_floatClamp(g,0.0,0.999),
+        .b = 255.999 * util_floatClamp(b,0.0,0.999))
+    };
 
     return temp;
 }
@@ -51,24 +51,24 @@ HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, CFLOAT t_min, CFLOAT t
     return h;
 }
 
-vec3 ray_c(Ray r, int n, Sphere sphere[n], int depth){
+RGBColorF ray_c(Ray r, int n, Sphere sphere[n], int depth){
     if(depth <= 0){
-        return (vec3){0};
+        return (RGBColorF){0};
     }
 
     HitRecord *  rec = hittableList(n, sphere, r, 0.1, FLT_MAX);
     if(rec != NULL){
         Ray scattered = {0};
-        vec3 attenuation = {0};
+        RGBColorF attenuation = {0};
         
         if(mat_scatter(&r, rec, &attenuation, &scattered)){
-            vec3 color = ray_c(scattered, n, sphere, depth - 1);
-            vector3_multiply(&color, &attenuation);
+            RGBColorF color = ray_c(scattered, n, sphere, depth - 1);
+            color = colorf_multiply(color, attenuation); 
             
             return color;
         }
 
-        return (vec3){0};
+        return (RGBColorF){0};
     }
 
     vec3 ud = r.direction;
@@ -80,7 +80,11 @@ vec3 ray_c(Ray r, int n, Sphere sphere[n], int depth){
     vector3_setf3(&inter3, 0.5 * t, 0.7 * t, 1.0 * t);
     vector3_add(&inter3, &inter4);
     
-    return inter3;
+    return (RGBColorF){
+        .r = inter3.x,
+        .g = inter3.y,
+        .b = inter3.z
+    };
 }
         
 void printProgressBar(int i, int max){
@@ -181,27 +185,34 @@ int main(int argc, char *argv[]){
 
     cam_setCamera(&c);
 
-    vec3 pixel_color;
+    RGBColorF pixel_color;
     Ray r;
-    vec3 temp;
+    RGBColorF temp;
+    vec3 temp1;
     
 
     for (int j = HEIGHT - 1; j >= 0; j--){
 
         for (int i = 0; i < WIDTH; i++){
 
-            vector3_zero(&pixel_color);
+            pixel_color = {0};
 
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
                 CFLOAT u = ((CFLOAT)i + util_randomFloat(0.0, 1.0)) / (WIDTH - 1);
                 CFLOAT v = ((CFLOAT)j + util_randomFloat(0.0, 1.0)) / (HEIGHT - 1);
                 r = cam_getRay(&c, u, v);
                 temp = ray_c(r, 4, s, MAX_DEPTH);
-                vector3_add(&pixel_color, &temp);    
+                pixel_color = colorf_add(pixel_color, temp);   
             }
 
             temp = writeColor(pixel_color, SAMPLES_PER_PIXEL);
-            vector3_set(&image[i + WIDTH * (HEIGHT - 1 - j)], &temp);
+
+            temp1 = {
+                .x = temp.r,
+                .y = temp.g,
+                .z = temp.b
+            };
+            vector3_set(&image[i + WIDTH * (HEIGHT - 1 - j)], &temp1);
         }
 
         printProgressBar(HEIGHT - 1 - j, HEIGHT - 1);
