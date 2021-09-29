@@ -111,6 +111,7 @@ void printProgressBar(int i, int max){
 
 
 int main(int argc, char *argv[]){
+
     if(argc < 2){
         printf("FATAL ERROR: Output file name not provided.\n");
         printf("EXITING ...\n");
@@ -121,9 +122,9 @@ int main(int argc, char *argv[]){
 
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
-    const CFLOAT aspect_ratio = 16.0 / 9.0;
+    const CFLOAT aspectRatio = 3.0 / 2.0;
     const int WIDTH = 500;
-    const int HEIGHT = (int)(WIDTH/aspect_ratio);
+    const int HEIGHT = (int)(WIDTH/aspectRatio);
     const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
     
@@ -178,13 +179,17 @@ int main(int argc, char *argv[]){
         }
     };
     
+
+    vec3 lookFrom = {.x = 3.0, .y = 3.0, .z = 2.0};
+    vec3 lookAt = {.x = 0.0, .y = 0.0, .z = -1.0};
+    vec3 up = {.x = 0.0, .y = 1.0, .z = 0.0};
+
+    CFLOAT distToFocus = 5.19615242271;
+    CFLOAT aperture = 2.0;
+
     Camera c;
-    cam_setLookAtCamera(&c, 
-                        (vec3){.x = -2.0, .y = 2.0, .z = 1.0}, 
-                        (vec3){.x = 0.0, .y = 0.0, .z = -1.0}, 
-                        (vec3){.x = 0.0, .y = 1.0, .z = 0.0}, 
-                        90, 
-                        aspect_ratio);
+    cam_setLookAtCamera(&c, lookFrom, lookAt, up, 20, aspectRatio, aperture, distToFocus);
+
     Ray r;
     RGBColorF temp;
     

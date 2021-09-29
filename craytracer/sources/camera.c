@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <tgmath.h>
 
+#include "util.h"
+
 static CFLOAT degreesToRadians(CFLOAT deg){
     return (M_PI / 180.0) * deg; 
 }
@@ -28,54 +30,83 @@ void cam_setCamera(Camera * restrict c, vec3 origin, CFLOAT aspectRatio,
 
 void cam_setLookAtCamera(Camera * restrict c, vec3 lookFrom, 
                          vec3 lookAt, vec3 up, CFLOAT vfov, 
-                         CFLOAT aspectRatio){
+                         CFLOAT aspectRatio, CFLOAT aperture,
+                         CFLOAT focusDist){
 
     c->aspectRatio = aspectRatio;
 
-    c->verticalFOV = degreesToRadians(vfov); 
+    c->verticalFOV = degreesToRadians(vfov);
 
     c->viewportHeight = 2.0 * tanf(c->verticalFOV / 2.0); 
     c->viewportWidth = c->aspectRatio * c->viewportHeight;
     
     // w = dir(lookFrom - lookAt)
-    vec3 w = lookFrom;
-    vector3_subtract(&w, &lookAt);
-    vector3_normalize(&w);
+    c->w = lookFrom;
+    vector3_subtract(&c->w, &lookAt);
+    vector3_normalize(&c->w);
     
     // u = dir(up - w)
-    vec3 u;
-    vector3_cross_product(&u, &up, &w);
-    vector3_normalize(&u);
+    vector3_cross_product(&c->u, &up, &c->w);
+    vector3_normalize(&c->u);
     
     // v = cross (w, u)
-    vec3 v;
-    vector3_cross_product(&v, &w, &u);
+    vector3_cross_product(&c->v, &c->w, &c->u);
     
     //origin = lookFrom 
     c->origin = lookFrom;
 
-    // horizontal = viewport_width * u
-    c->horizontal = u;
-    vector3_multiplyf(&c->horizontal, c->viewportWidth);
+    // horizontal = focusDist * viewport_width * u
+    c->horizontal = c->u;
+    vector3_multiplyf(&c->horizontal, c->viewportWidth * focusDist);
     
-    // vertical = viewport_height * v
-    c->vertical = v;
+    // vertical = focusDist * viewport_height * v
+    c->vertical = c->v;
     vector3_multiplyf(&c->vertical, c->viewportHeight);
+    vector3_multiplyf(&c->vertical, c->viewportHeight * focusDist);
     
-    // lower_left_corner = origin - (horizontal + vertical)/2 - w
+    // lower_left_corner = origin - (horizontal + vertical)/2 - w * focusDist
     c->lowerLeftCorner = c->horizontal;
     vector3_add(&c->lowerLeftCorner, &c->vertical);
     vector3_multiplyf(&c->lowerLeftCorner, -0.5);
-    vector3_subtract(&c->lowerLeftCorner, &w);
+    vec3 temp = c->w;
+    vector3_multiplyf(&temp, focusDist);
+    vector3_subtract(&c->lowerLeftCorner, &temp);
     vector3_add(&c->lowerLeftCorner, &c->origin);
+
+
+    c->lensRadius = aperture / 2.0;
 }
 
 Ray cam_getRay(const Camera * restrict cam, CFLOAT u, CFLOAT v){
-    vec3 direction = {
-        .x = cam->lowerLeftCorner.x + u * cam->horizontal.x + v * cam->vertical.x - cam->origin.x,
-        .y = cam->lowerLeftCorner.y + u * cam->horizontal.y + v * cam->vertical.y - cam->origin.y,
-        .z = cam->lowerLeftCorner.z + u * cam->horizontal.z + v * cam->vertical.z - cam->origin.z
+
+    // randOnDist = lensRadius * util_randomUnitDisk()
+    vec3 randOnDist = util_randomUnitDisk();
+    vector3_multiplyf(&randOnDist, cam->lensRadius);
+    
+    CFLOAT x = randOnDist.x;
+    CFLOAT y = randOnDist.y;
+
+    // offset = randOnDist.x * c->u + randOnDist.y * c->v
+    vec3 offset = {
+        .x = x * cam->u.x + y * cam->v.x,
+        .y = x * cam->u.y + y * cam->v.y,
+        .z = x * cam->u.z + y * cam->v.z,
     };
     
-    return ray_create(cam->origin, direction);
+    // outOrigin = cam->origin + offset
+    vec3 outOrigin = cam->origin;
+    vector3_add(&outOrigin, &offset);
+    
+    // direction = lowerLeftCorner + u*horizontal + v*vertical - origin - offset
+    vec3 outDirection = cam->lowerLeftCorner;
+    vec3 uHori = cam->horizontal;
+    vector3_multiplyf(&uHori, u);
+    vec3 vVeri = cam->vertical;
+    vector3_multiplyf(&vVeri, v);
+    vector3_add(&outDirection, &uHori);
+    vector3_add(&outDirection, &vVeri);
+    vector3_subtract(&outDirection, &cam->origin);
+    vector3_subtract(&outDirection, &offset);
+
+    return ray_create(outOrigin, outDirection);
 }
