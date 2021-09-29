@@ -109,6 +109,148 @@ void printProgressBar(int i, int max){
     }
 }
 
+#define randomFloat() util_randomFloat(0.0, 1.0)
+
+void randomSpheres(int n, Sphere spheres[n], int * out){
+    if(n < 500){
+        return;
+    }
+
+    int i = 0;
+    LambertianMat* materialGround = malloc(sizeof(LambertianMat));
+    materialGround->albedo.r = 0.5;
+    materialGround->albedo.g = 0.5;
+    materialGround->albedo.b = 0.5;
+
+    spheres[i] = (Sphere){
+        .center = {.x = 0, .y = -1000, .z = 0},
+        .radius = 1000,
+        .sphMat = {
+            .matLamb = materialGround,
+            .matType = LAMBERTIAN
+        }
+    };
+
+    i += 1;
+
+    for (int a = -11; a < 11; a++){
+        for (int b = -11; b < 11; b++){
+            CFLOAT chooseMat = randomFloat();
+            vec3 center = {
+                .x = a + 0.9 * randomFloat(), 
+                .y = 0.2, 
+                .z = b + 0.9 * randomFloat()
+            };
+
+            CFLOAT length = sqrtf((center.x - 4) * (center.x - 4) 
+                        +   (center.y - 0.2) * (center.y - 0.2)
+                        +   (center.z - 0) * (center.z - 0));
+            
+            if(length > 0.9){
+                if(chooseMat < 0.8){
+                    // diffuse
+                    RGBColorF albedo = {
+                        .r = randomFloat() * randomFloat(),
+                        .g = randomFloat() * randomFloat(),
+                        .b = randomFloat() * randomFloat(),
+                    };
+
+                    LambertianMat* lambMat = malloc(sizeof(LambertianMat));
+                    lambMat->albedo = albedo;
+                    spheres[i] = (Sphere) {
+                        .center = center,
+                        .radius = 0.2,
+                        .sphMat = {.matLamb = lambMat, .matType = LAMBERTIAN }
+                    };
+
+                    i += 1;
+                }else if(chooseMat < 0.95){
+                    // metal
+                    RGBColorF albedo = {
+                        .r = util_randomFloat(0.5, 1.0),
+                        .g = util_randomFloat(0.5, 1.0),
+                        .b = util_randomFloat(0.5, 1.0)
+                    };
+                    CFLOAT fuzz = util_randomFloat(0.5, 1.0);
+                        
+                    MetalMat* metalMat = malloc(sizeof(MetalMat));
+                    metalMat->albedo = albedo;
+                    metalMat->fuzz = fuzz;
+
+                    spheres[i] = (Sphere) {
+                        .center = center,
+                        .radius = 0.2,
+                        .sphMat = {.matMetal = metalMat, .matType = METAL }
+                    };
+
+                    i += 1;
+ 
+                }else{
+                    DielectricMat * dMat = malloc(sizeof(DielectricMat));
+                    dMat->ir = 0.5;
+                    spheres[i] = (Sphere) {
+                        .center = center,
+                        .radius = 0.2,
+                        .sphMat = {.matDielectric = dMat, .matType = DIELECTRIC }
+                    };
+
+                    i += 1;
+                }
+
+            }
+        }
+    }
+
+    DielectricMat* material1 = malloc(sizeof(DielectricMat));
+    material1->ir = 1.5;
+
+    spheres[i] = (Sphere){
+        .center = {.x = 0, .y = 1, .z = 0},
+        .radius = 1.0,
+        .sphMat = {
+            .matDielectric = material1,
+            .matType = DIELECTRIC
+        }
+    };
+
+    i += 1;
+    
+    LambertianMat* material2 = malloc(sizeof(LambertianMat));
+    material2->albedo.r = 0.4;
+    material2->albedo.g = 0.2;
+    material2->albedo.b = 0.1;
+
+    spheres[i] = (Sphere){
+        .center = {.x = -4, .y = 1, .z = 0},
+        .radius = 1.0,
+        .sphMat = {
+            .matLamb = material2,
+            .matType = LAMBERTIAN
+        }
+    };
+        
+    i += 1;
+
+    MetalMat* material3 = malloc(sizeof(MetalMat));
+    material3->albedo.r = 0.7;
+    material3->albedo.g = 0.6;
+    material3->albedo.b = 0.5;
+    material3->fuzz = 0.0;
+
+    spheres[i] = (Sphere){
+        .center = {.x = 4, .y = 1, .z = 0},
+        .radius = 1.0,
+        .sphMat = {
+            .matMetal = material3,
+            .matType = METAL
+        }
+    };
+
+    i += 1;
+    *out = i;
+}
+
+#undef randomFloat
 
 int main(int argc, char *argv[]){
     if(argc < 2){
@@ -121,12 +263,12 @@ int main(int argc, char *argv[]){
 
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
-    const CFLOAT aspect_ratio = 16.0 / 9.0;
+    const CFLOAT aspect_ratio = 3.0 / 2.0;
     const int WIDTH = 500;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
-    const int SAMPLES_PER_PIXEL = 100;
-    const int MAX_DEPTH = 50;
-    
+    const int SAMPLES_PER_PIXEL = 10;
+    const int MAX_DEPTH = 10;
+/*    
     LambertianMat materialGround = {
         .albedo = {.r = 0.8, .g = 0.8, .b = 0.0}
     };
@@ -177,13 +319,20 @@ int main(int argc, char *argv[]){
         .sphMat = {.matMetal = &materialRight, .matType = METAL },
         }
     };
+*/    
+
+
+    Sphere *s = malloc(500 * sizeof(Sphere));
+    int numSpheres = 0;
     
+    randomSpheres(500, s, &numSpheres);
+
     Camera c;
     cam_setLookAtCamera(&c, 
-                        (vec3){.x = -2.0, .y = 2.0, .z = 1.0}, 
-                        (vec3){.x = 0.0, .y = 0.0, .z = -1.0}, 
+                        (vec3){.x = 13.0, .y = 2.0, .z = 3.0}, 
+                        (vec3){.x = 0.0, .y = 0.0, .z = 0.0}, 
                         (vec3){.x = 0.0, .y = 1.0, .z = 0.0}, 
-                        90, 
+                        20, 
                         aspect_ratio);
     Ray r;
     RGBColorF temp;
@@ -219,6 +368,7 @@ int main(int argc, char *argv[]){
 
     writeToPPM(argv[1], WIDTH, HEIGHT, image);
     free(image);
+    free(s);
     alloc_freePoolAllocator(hrpa);
 
     return 0;
