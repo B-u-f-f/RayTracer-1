@@ -5,56 +5,75 @@
 
 #include "color.h"
 #include "testutils.h"
+#include "hypatiaINC.h"
 
 START_TEST(check_uint8_create_color){
 
-    RGBColorU8 res = coloru8_create(0, 0, 1);
+    RGBColorU8 color = coloru8_create(232, 134, 178);
 
-    ck_assert_int_eq(res.x, 0);
-    ck_assert_int_eq(res.y, 0);
-    ck_assert_int_eq(res.z, 1);
+    RGBColorU8 exp_color = {
+        .r = 232,
+        .g = 134, 
+        .b = 178
+    };
+
+    ck_assert_coloru8_eq(color, exp_color);
 
 }END_TEST
 
+
+
 START_TEST(check_f_create_color){
 
-    RGBColorU8 res = colorf_create(0.5, 0.3, 0.9);
+    RGBColorF color = colorf_create(0.5, 0.3, 0.9);
 
-    ck_float_equal(res.x, 0.5);
-    ck_float_equal(res.y, 0.3);
-    ck_float_equal(res.z, 0.9);
+    RGBColorF exp_color = {
+        .r = 0.5,
+        .g = 0.3,
+        .b = 0.9
+    };  
+
+    ck_assert_colorf_eq(color, exp_color);
 
 }END_TEST
 
 START_TEST(convert_u8_f){
 
     RGBColorU8 in = {
-        .x = 0,
-        .y = 1.
-        .z = 1
+        .r = 145,
+        .g = 234,
+        .b = 78
+    };
+    
+    RGBColorF exp_c = {
+        .r = 0.56640625,
+        .g = 0.9140625,
+        .b = 0.3046875
     };
 
     RGBColorF out = convertU8toF(in);
 
-    ck_float_equal(out.x, 0.0);
-    ck_float_equal(out.y, 1.0);
-    ck_float_equal(out.z, 1.0);
+    ck_assert_colorf_eq(exp_c, out);
 
 }END_TEST
 
 START_TEST(convert_f_u8){
 
     RGBColorF in = {
-        .x = 0.5,
-        .y = 0.3,
-        .z = 0.2
+        .r = 0.5,
+        .g = 0.3,
+        .b = 1
     };
 
-    RGBColorF out = convertU8toF(in);
+    RGBColorU8 out = convertFtoU8(in);
 
-    ck_assert_int_eq(out.x, 0);
-    ck_assert_int_eq(out.y, 0);
-    ck_assert_int_eq(out.z, 0);
+    RGBColorU8 exp_c = {
+        .r = 128,
+        .g = 76,
+        .b = 255
+    };
+
+    ck_assert_coloru8_eq(exp_c, out);
 
 }END_TEST
 

@@ -16,8 +16,9 @@
 #include "hypatiaINC.h"
 #include "ray.h"
 #include "material.h"
+#include "color.h"
 
-RGBColorF writeColor(RGBColorF pixel_color, int sample_per_pixel){
+RGBColorU8 writeColor(RGBColorF pixel_color, int sample_per_pixel){
     CFLOAT r = pixel_color.r;
     CFLOAT g = pixel_color.g;
     CFLOAT b = pixel_color.b;
@@ -28,13 +29,7 @@ RGBColorF writeColor(RGBColorF pixel_color, int sample_per_pixel){
     g = sqrt(scale * g);
     b = sqrt(scale * b);
 
-    RGBColorF temp = {
-        .r = 255.999 * util_floatClamp(r,0.0,0.999),
-        .g = 255.999 * util_floatClamp(g,0.0,0.999),
-        .b = 255.999 * util_floatClamp(b,0.0,0.999))
-    };
-
-    return temp;
+    return COLOR_U8CREATE(r, g, b);
 }
 
 HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, CFLOAT t_min, CFLOAT t_max){
@@ -123,23 +118,21 @@ int main(int argc, char *argv[]){
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
-    
-    vec3* image = (vec3*) malloc(sizeof(vec3) * HEIGHT * WIDTH);
 
     LambertianMat materialGround = {
-        .albedo = {.x = 0.8, .y = 0.8, .z = 0.0}
+        .albedo = {.r = 0.8, .g = 0.8, .b = 0.0}
     };
 
     LambertianMat materialCenter = {
-        .albedo = {.x = 0.7, .y = 0.3, .z = 0.3}
+        .albedo = {.r = 0.7, .g = 0.3, .b = 0.3}
     }; 
 
     MetalMat materialLeft = {
-        .albedo = {.x = 0.8, .y = 0.8, .z = 0.8},
+        .albedo = {.r = 0.8, .g = 0.8, .b = 0.8},
         .fuzz = 0.3
     };
     MetalMat materialRight = {
-        .albedo = {.x = 0.8, .y = 0.6,.z = 0.2},
+        .albedo = {.r = 0.8, .g = 0.6,.b = 0.2},
         .fuzz = 1.0
     }; 
 
@@ -188,14 +181,13 @@ int main(int argc, char *argv[]){
     RGBColorF pixel_color;
     Ray r;
     RGBColorF temp;
-    vec3 temp1;
     
+    RGBColorU8* image = (RGBColorU8*) malloc(sizeof(RGBColorF) * HEIGHT * WIDTH);
 
     for (int j = HEIGHT - 1; j >= 0; j--){
-
         for (int i = 0; i < WIDTH; i++){
 
-            pixel_color = {0};
+            pixel_color = (RGBColorF){.r = 0.0, .g = 0.0, .b = 0.0};
 
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
                 CFLOAT u = ((CFLOAT)i + util_randomFloat(0.0, 1.0)) / (WIDTH - 1);
@@ -205,14 +197,8 @@ int main(int argc, char *argv[]){
                 pixel_color = colorf_add(pixel_color, temp);   
             }
 
-            temp = writeColor(pixel_color, SAMPLES_PER_PIXEL);
-
-            temp1 = {
-                .x = temp.r,
-                .y = temp.g,
-                .z = temp.b
-            };
-            vector3_set(&image[i + WIDTH * (HEIGHT - 1 - j)], &temp1);
+            image[i + WIDTH * (HEIGHT - 1 - j)] = writeColor(pixel_color, SAMPLES_PER_PIXEL);
+            
         }
 
         printProgressBar(HEIGHT - 1 - j, HEIGHT - 1);

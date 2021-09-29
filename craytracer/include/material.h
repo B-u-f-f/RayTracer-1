@@ -5,6 +5,7 @@
 #include "ray.h"
 #include "hitRecord.h"
 #include "hypatiaINC.h"
+#include "color.h"
 
 #include <stdbool.h>
 

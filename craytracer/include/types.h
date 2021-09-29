@@ -6,7 +6,7 @@
 
 #ifdef C_RAY_SINGLE_PRECISION 
     typedef float CFLOAT;
-    #define CF_MIN(x, y) fminf(x, y) 
+    #define CF_MIN(x, y) fmin(x, y) 
     #define F_EPSILON FLT_EPSILON
     #define F_MAX FLT_MAX
     #define F_MIN FLT_MIN

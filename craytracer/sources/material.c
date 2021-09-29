@@ -57,7 +57,7 @@ static bool mat_lambScatter(const LambertianMat * restrict nlambMat,
 
 static bool mat_dielectricScatter(const DielectricMat * restrict ndielectricMat, const Ray * restrict rayIn, const HitRecord * restrict rec, RGBColorF * restrict attenuation, Ray * restrict out ){
      
-     *attenuation = (RGBColorF){
+    *attenuation = (RGBColorF){
         .r = 1.0,
         .g = 1.0,
         .b = 1.0

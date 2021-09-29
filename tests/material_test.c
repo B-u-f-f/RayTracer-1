@@ -9,13 +9,14 @@
 #include "hitRecord.h"
 #include "ray.h"
 #include "testutils.h"
+#include "color.h"
 
 START_TEST(check_material_lambertian){
     LambertianMat t_lmat = {
         .albedo = {
-            .x = 1.0,
-            .y = 2.0,
-            .z = 3.0
+            .r = 1.0,
+            .g = 2.0,
+            .b = 3.0
         }
     };
 
@@ -72,10 +73,10 @@ START_TEST(check_material_lambertian){
         
     };
 
-    vec3 attenuation = {
-        .x = 0.0,
-        .y = 0.0,
-        .z = 0.0
+    RGBColorF attenuation = {
+        .r = 0.0,
+        .g = 0.0,
+        .b = 0.0
     };
 
     //random_numbers = x = 0.37963565706642355, y = 0.87001058857811875, z = 0.31457645119382399
@@ -96,28 +97,26 @@ START_TEST(check_material_lambertian){
         }   
     };
 
-    vec3 exp_attenuation = {
-        .x = 1.0,
-        .y = 2.0,
-        .z = 3.0
+    RGBColorF exp_attenuation = {
+        .r = 1.0,
+        .g = 2.0,
+        .b = 3.0
     };
 
     ck_assert_ld_vec3_eq(expected_ray.origin, out.origin);
     ck_assert_ld_vec3_eq(expected_ray.direction, out.direction);
-    ck_assert_ld_vec3_eq(exp_attenuation, t_lmat.albedo);
+    ck_assert_colorf_eq(exp_attenuation, t_lmat.albedo);
     ck_assert_int_eq(b, 1);
 }
 END_TEST
 
 START_TEST (check_material_metal_true){
 
-    
-
     MetalMat nmetalMat = {
         .albedo = {
-            .x = 1.0,
-            .y = 2.0,
-            .z = 3.0
+            .r = 1.0,
+            .g = 2.0,
+            .b = 3.0
         },
         .fuzz = 0.2
     };
@@ -176,10 +175,10 @@ START_TEST (check_material_metal_true){
         .hitObjMat = &ma
     };
 
-    vec3 attenuation = {
-        .x = 0,
-        .y = 0,
-        .z = 0
+    RGBColorF attenuation = {
+        .r = 0,
+        .g = 0,
+        .b = 0
     };
 
     Ray out = {
@@ -210,16 +209,16 @@ START_TEST (check_material_metal_true){
         }
     };
 
-    vec3 exp_attenuation = {
-        .x = 1.0,
-        .y = 2.0,
-        .z = 3.0
+    RGBColorF exp_attenuation = {
+        .r = 1.0,
+        .g = 2.0,
+        .b = 3.0
     };
 
 
     bool b = mat_scatter(&rayIn, &rec, &attenuation, &out);
     
-    ck_assert_ld_vec3_eq(exp_attenuation, attenuation);
+    ck_assert_colorf_eq(exp_attenuation, attenuation);
     ck_assert_ld_vec3_eq(exp_out.origin, out.origin);
     ck_assert_ld_vec3_eq(exp_out.direction, out.direction);
     ck_assert_int_eq(1, b);
@@ -231,9 +230,9 @@ START_TEST (check_material_metal_false) {
 
     MetalMat nmetalMat = {
         .albedo = {
-            .x = 1.0,
-            .y = 2.0,
-            .z = 3.0
+            .r = 1.0,
+            .g = 2.0,
+            .b = 3.0
         },
         .fuzz = 0.3
     };
@@ -288,10 +287,10 @@ START_TEST (check_material_metal_false) {
         .hitObjMat = &ma
     };
 
-    vec3 attenuation = {
-        .x = 0,
-        .y = 0,
-        .z = 0
+    RGBColorF attenuation = {
+        .r = 0,
+        .g = 0,
+        .b = 0
     };
 
     Ray out = {
@@ -323,15 +322,15 @@ START_TEST (check_material_metal_false) {
         }
     };
 
-    vec3 exp_attenuation = {
-        .x = 1.0,
-        .y = 2.0,
-        .z = 3.0
+    RGBColorF exp_attenuation = {
+        .r = 1.0,
+        .g = 2.0,
+        .b = 3.0
     };
 
     bool b = mat_scatter(&rayIn, &rec, &attenuation, &out);
     
-    ck_assert_ld_vec3_eq(exp_attenuation, attenuation);
+    ck_assert_colorf_eq(exp_attenuation, attenuation);
     ck_assert_ld_vec3_eq(exp_out.origin, out.origin);
     ck_assert_ld_vec3_eq(exp_out.direction, out.direction);
     ck_assert_int_eq(0, b);
@@ -399,10 +398,10 @@ START_TEST(check_material_dielectric){
     // abv * n = {0.399141206536, 0.798282413071, 0.399141206536}
     // r_out_parallel + r_out+perp = (0.27787342249795688, 0.91955028255041327, 0.27787342249795688)
 
-    vec3 attenuation = {
-        .x = 0,
-        .y = 0,
-        .z = 0
+    RGBColorF attenuation = {
+        .r = 0,
+        .g = 0,
+        .b = 0
     };
 
     Ray out = {
@@ -434,17 +433,17 @@ START_TEST(check_material_dielectric){
         }
     };
 
-    vec3 exp_attenuation = {
-        .x = 1.0,
-        .y = 1.0,
-        .z = 1.0
+    RGBColorF exp_attenuation = {
+        .r = 1.0,
+        .g = 1.0,
+        .b = 1.0
     };
 
 
     bool b = mat_scatter(&rayIn, &rec, &attenuation, &out);
 
     ck_assert_int_eq(1, b);
-    ck_assert_ld_vec3_eq(exp_attenuation, attenuation);
+    ck_assert_colorf_eq(exp_attenuation, attenuation);
     ck_assert_ld_vec3_eq(exp_out.origin, out.origin);
     ck_assert_ld_vec3_eq(exp_out.direction, out.direction);
 

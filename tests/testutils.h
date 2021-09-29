@@ -18,6 +18,17 @@
     ck_float_equal((v1).z, (v2).z); \
 } \
 
+#define ck_assert_colorf_eq(v1, v2) { \
+    ck_float_equal((v1).r, (v2).r); \
+    ck_float_equal((v1).g, (v2).g); \
+    ck_float_equal((v1).b, (v2).b); \
+} \
+
+#define ck_assert_coloru8_eq(v1, v2) { \
+    ck_assert_int_eq(ck_assert_u8_eq((v1).r, (v2).r), 1); \
+    ck_assert_int_eq(ck_assert_u8_eq((v1).g, (v2).g), 1); \
+    ck_assert_int_eq(ck_assert_u8_eq((v1).b, (v2).b), 1); \
+} \
 
 extern bool nearly_equal(CFLOAT a, CFLOAT b, CFLOAT epsilon, CFLOAT abs_th){
     assert(F_EPSILON <= epsilon);
@@ -30,5 +41,9 @@ extern bool nearly_equal(CFLOAT a, CFLOAT b, CFLOAT epsilon, CFLOAT abs_th){
     return diff < fmax(abs_th, epsilon * norm);
 }
 
+
+extern bool ck_assert_u8_eq(uint8_t a, uint8_t b){
+    return a == b;
+}
 
 #endif 
