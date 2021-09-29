@@ -28,11 +28,15 @@ typedef struct rgbColorF {
 
 
 extern RGBColorU8 coloru8_create(uint8_t r, uint8_t g, uint8_t b);
+// a
 extern RGBColorU8 coloru8_createf(CFLOAT r, CFLOAT g, CFLOAT b);
 
 extern RGBColorF colorf_create(CFLOAT r, CFLOAT g, CFLOAT b);
 extern RGBColorF convertU8toF(RGBColorU8 in);
+
 extern RGBColorU8 convertFtoU8(RGBColorF in);
+
+// a
 extern RGBColorF colorf_multiply(RGBColorF x, RGBColorF y);
 extern RGBColorF colorf_add(RGBColorF x, RGBColorF y);
 
