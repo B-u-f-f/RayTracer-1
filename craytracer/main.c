@@ -126,7 +126,7 @@ int main(int argc, char *argv[]){
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
-
+    
     LambertianMat materialGround = {
         .albedo = {.r = 0.8, .g = 0.8, .b = 0.0}
     };
@@ -149,8 +149,14 @@ int main(int argc, char *argv[]){
     Sphere s[numSpheres] = {
         {
         .center = { .x = 0.0, .y = -100.5, .z = -1.0},
-        .radius = 100,
+        .radius = 100.0,
         .sphMat = {.matLamb = &materialGround, .matType = LAMBERTIAN },
+        }, 
+         
+        {
+        .center = { .x = 0.0, .y = 0.0, .z = -1.0},
+        .radius = 0.5,
+        .sphMat = {.matLamb = &materialCenter, .matType = LAMBERTIAN },
         }, 
         
         {
@@ -161,7 +167,7 @@ int main(int argc, char *argv[]){
 
         {
         .center = {.x = -1.0, .y = 0.0, .z = -1.0},
-        .radius = -0.4,
+        .radius = -0.45,
         .sphMat = {.matDielectric = &materialLeft, .matType = DIELECTRIC },
         },
 
@@ -169,29 +175,16 @@ int main(int argc, char *argv[]){
         .center = {.x = 1.0, .y = 0.0, .z = -1.0},
         .radius = 0.5,
         .sphMat = {.matMetal = &materialRight, .matType = METAL },
-        },
-
-        {
-        .center = {.x = 0.0, .y = 0.0, .z = -1.0},
-        .radius = 0.5,
-        .sphMat = {.matLamb = &materialCenter, .matType = LAMBERTIAN },
-        },
-
+        }
     };
     
-    Camera c = {
-        .origin = {
-            .x = 0.0,
-            .y = 0.0
-        },
-
-        .aspect_ratio = 16.0/9.0,
-        .viewport_height = 2.0,
-        .focal_length = 1.0
-    };
-
-    cam_setCamera(&c);
-
+    Camera c;
+    cam_setLookAtCamera(&c, 
+                        (vec3){.x = -2.0, .y = 2.0, .z = 1.0}, 
+                        (vec3){.x = 0.0, .y = 0.0, .z = -1.0}, 
+                        (vec3){.x = 0.0, .y = 1.0, .z = 0.0}, 
+                        90, 
+                        aspect_ratio);
     Ray r;
     RGBColorF temp;
     

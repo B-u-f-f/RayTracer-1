@@ -19,9 +19,9 @@ START_TEST(check_camera_1){
             .z = 0.0
         },
 
-        .aspect_ratio = 16.0/9.0,
-        .viewport_height = 2.0,
-        .focal_length = 1.0
+        .aspectRatio = 16.0/9.0,
+        .viewportHeight = 2.0,
+        .focalLength = 1.0
     };
     cam_setCamera(&c);
 
@@ -47,12 +47,12 @@ START_TEST(check_camera_1){
         .z = 0.0
     };
     
-    ck_float_equal(exp_viewport_width, c.viewport_width);
+    ck_float_equal(exp_viewport_width, c.viewportWidth);
     ck_assert_ld_vec3_eq(c.horizontal, exp_horizontal);
 
     ck_assert_ld_vec3_eq(c.vertical, exp_vertical);
 
-    ck_assert_ld_vec3_eq(c.lower_left_corner, exp_lower_left_corner);
+    ck_assert_ld_vec3_eq(c.lowerLeftCorner, exp_lower_left_corner);
 }
 END_TEST 
 
@@ -64,9 +64,9 @@ START_TEST(check_camera_2){
             .z = 0.0
         },
 
-        .aspect_ratio = 16.0/9.0,
-        .viewport_height = 2.0,
-        .focal_length = 1.0
+        .aspectRatio = 16.0/9.0,
+        .viewportHeight = 2.0,
+        .focalLength = 1.0
     };
 
     cam_setCamera(&c);
