@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdalign.h>
 
 #include "outfile.h"
 #include "util.h"
@@ -17,6 +18,7 @@
 #include "ray.h"
 #include "material.h"
 #include "color.h"
+#include "poolAllocator.h"
 
 RGBColorU8 writeColor(RGBColorF pixel_color, int sample_per_pixel){
     CFLOAT r = pixel_color.r;
@@ -32,33 +34,37 @@ RGBColorU8 writeColor(RGBColorF pixel_color, int sample_per_pixel){
     return COLOR_U8CREATE(r, g, b);
 }
 
-HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, CFLOAT t_min, CFLOAT t_max){
-    HitRecord * r = NULL;
+HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, PoolAlloc * restrict hrAlloc, CFLOAT t_min, CFLOAT t_max){
+    HitRecord * r = (HitRecord *) alloc_poolAllocAllocate(hrAlloc);
     HitRecord * h = NULL;
 
     for(int i = 0; i < n; i++){
-        r = hit(&sphere[i], ray, t_min, t_max);
+        hit(sphere + i, ray, t_min, t_max, r);
 
-        if(r != NULL){
+        if(r->valid){
+            alloc_poolAllocFree(hrAlloc, h);
             h = r;
+            r = (HitRecord *) alloc_poolAllocAllocate(hrAlloc);
         }
     }    
     return h;
 }
 
-RGBColorF ray_c(Ray r, int n, Sphere sphere[n], int depth){
+
+RGBColorF ray_c(Ray r, int n, Sphere sphere[n], int depth, PoolAlloc * restrict hrAlloc){
     if(depth <= 0){
         return (RGBColorF){0};
     }
 
-    HitRecord *  rec = hittableList(n, sphere, r, 0.1, FLT_MAX);
+    HitRecord *  rec = hittableList(n, sphere, r, hrAlloc, 0.1, FLT_MAX);
     if(rec != NULL){
         Ray scattered = {0};
         RGBColorF attenuation = {0};
         
         if(mat_scatter(&r, rec, &attenuation, &scattered)){
-            RGBColorF color = ray_c(scattered, n, sphere, depth - 1);
+            RGBColorF color = ray_c(scattered, n, sphere, depth - 1, hrAlloc);
             color = colorf_multiply(color, attenuation); 
+
             
             return color;
         }
@@ -114,7 +120,7 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 16.0 / 9.0;
-    const int WIDTH = 100;
+    const int WIDTH = 500;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
@@ -143,14 +149,7 @@ int main(int argc, char *argv[]){
         .radius = 100,
         .sphMat = {.matLamb = &materialGround, .matType = LAMBERTIAN },
         },
-        
-        {
-        .center = {.x = 0.0, .y = 0.0, .z = -1.0},
-        .radius = 0.5,
-        .sphMat = {.matLamb = &materialCenter, .matType = LAMBERTIAN },
-        },
-
-        
+           
         {
         .center = {.x = -1.0, .y = 0.0, .z = -1.0},
         .radius = 0.5,
@@ -162,7 +161,14 @@ int main(int argc, char *argv[]){
         
         .radius = 0.5,
         .sphMat = {.matMetal = &materialRight, .matType = METAL},
-        }
+        },
+
+        {
+        .center = {.x = 0.0, .y = 0.0, .z = -1.0},
+        .radius = 0.5,
+        .sphMat = {.matLamb = &materialCenter, .matType = LAMBERTIAN },
+        },
+
     };
     
     Camera c = {
@@ -183,6 +189,7 @@ int main(int argc, char *argv[]){
     RGBColorF temp;
     
     RGBColorU8* image = (RGBColorU8*) malloc(sizeof(RGBColorF) * HEIGHT * WIDTH);
+    PoolAlloc * hrpa = alloc_createPoolAllocator(sizeof(HitRecord) * MAX_DEPTH * SAMPLES_PER_PIXEL * 2, alignof(HitRecord), sizeof(HitRecord)); 
 
     for (int j = HEIGHT - 1; j >= 0; j--){
         for (int i = 0; i < WIDTH; i++){
@@ -193,12 +200,13 @@ int main(int argc, char *argv[]){
                 CFLOAT u = ((CFLOAT)i + util_randomFloat(0.0, 1.0)) / (WIDTH - 1);
                 CFLOAT v = ((CFLOAT)j + util_randomFloat(0.0, 1.0)) / (HEIGHT - 1);
                 r = cam_getRay(&c, u, v);
+              
                 temp = ray_c(r, 4, s, MAX_DEPTH);
                 pixel_color = colorf_add(pixel_color, temp);   
             }
 
             image[i + WIDTH * (HEIGHT - 1 - j)] = writeColor(pixel_color, SAMPLES_PER_PIXEL);
-            
+            alloc_poolAllocFreeAll(hrpa);
         }
 
         printProgressBar(HEIGHT - 1 - j, HEIGHT - 1);
@@ -206,6 +214,7 @@ int main(int argc, char *argv[]){
 
     writeToPPM(argv[1], WIDTH, HEIGHT, image);
     free(image);
+    alloc_freePoolAllocator(hrpa);
 
     return 0;
 }
