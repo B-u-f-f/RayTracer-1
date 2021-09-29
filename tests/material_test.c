@@ -339,7 +339,18 @@ START_TEST (check_material_metal_false) {
     
 }END_TEST
 
-START_TEST(check_material_dielectric){
+
+// 2*dot_prod = 1.980295085953348833406939841573836
+    // n * 2_dot_prod = {-0.8084520834544435, -1.616904166908887, -0.8084520834544435}
+    // d - n = (0.3233808333817776, 0.889297291799888, 0.3233808333817776)
+    // normalized = (0.323380833381777, 0.88929729179989, 0.323380833381777)
+
+    // cnst rndm_nbrs = {0.33522275571488902, 0.768229594811904, 0.27777471080318777}
+    // fuzz*rndm = {0.100566826714466706, 0.2304688784435712, 0.083332413240956331}
+    // above + reflected = (0.423947660096244, 1.11976617024346, 0.406713246622733)
+    // nrml = (0.335262370437306, 0.88552313388426, 0.321633210854460)
+
+START_TEST(check_material_dielectric_reflect){
 
     DielectricMat ndielectricMat = {
         .ir = 1.5
@@ -403,6 +414,13 @@ START_TEST(check_material_dielectric){
     // sin = 0.140028008402800219858194714742080986597179923186757330782312116
     // refraction_ratio * sin = 0.210042012604200329787292072113121479895769884780135996173468174
     
+    //reflactance function used here-on
+    // r0 = -0.2
+    // r0*r0 = 0.0400000000000000
+    // 0.96 + 0.0400000000000000 * 31.219530949541927
+    // 2.208781237981677
+
+    
     RGBColorF attenuation = {
         .r = 0,
         .g = 0,
@@ -432,10 +450,12 @@ START_TEST(check_material_dielectric){
         },
 
         .direction = {
-            .x = 0.27787342249795688,
-            .y = 0.91955028255041327,
-            .z = 0.27787342249795688
+            .x = 0.323380833381777,
+            .y = 0.88929729179989,
+            .z = 0.323380833381777
         }
+
+        
     };
 
     RGBColorF exp_attenuation = {
@@ -456,6 +476,122 @@ START_TEST(check_material_dielectric){
 
 
 
+START_TEST(check_material_dielectric_refract){
+
+    DielectricMat ndielectricMat = {
+        .ir = 0.8
+    };
+
+    Ray rayIn = {
+        .origin = {
+            .x = 0,
+            .y = 0,
+            .z = 0
+        },
+
+        .direction = {
+            .x = -0.3333333333333333,
+            .y = -0.3333333333333333,
+            .z = -0.3333333333333333
+        }
+    };
+
+    Material ma = {
+        .matLamb = NULL,
+        .matMetal = NULL,
+        .matDielectric = &ndielectricMat,
+        .matType = DIELECTRIC
+    };
+
+    HitRecord rec = {
+        .point = {
+            .x = 4.0,
+            .y = 3.0, 
+            .z = 2.0
+        },
+
+        .normal = {
+            .x = 0.047619047619047616,
+            .y = 0.09523809523809523,
+            .z = 0.19047619047619047
+        },
+
+        .distanceFromOrigin = 3.0,
+        .frontFace = false,
+        .valid = true,
+        .hitObjMat = &ma
+    };
+
+    // cos = 0.11111111111111 refractive_idx = 0.8 
+    // after reflectance 0.56042366153742923
+    // 0.84018771715470952
+    // sin_theta = 0.99380798999990666
+    // ratio * sin = 0.7950463919999253
+    // uv = {-0.3333333333333333, -0.3333333333333333, -0.3333333333333333}
+    // n = {0.047619047619047616, 0.09523809523809523, 0.19047619047619047}
+    // etai_over_etat = 0.8
+    // n * cos = {0.0052910052910052, 0.010582010582010, 0.021164021164021}
+    // abv + uv = (-0.3280423280423281, -0.322751322751323, -0.312169312169312)
+    // abv * etai_over = (-0.26243386243386248, -0.25820105820105843, -0.2497354497354496)
+    // 0.06236779485456727368662691414016 + 0.0666677864561463627320623722740649 + 0.0688715321519554565948321715517504
+    // abv.length_squared = 0.1979071134626690930135214579659753
+    // 1 - abv = 0.8020928865373309069864785420340247
+    // sqrt(abv) = 0.8955963859559343414905968366503420
+    // r_perp_len = -0.8955963859559343414905968366503420
+    // abv * n = {-0.042647446950282585, -0.08529489390056517, -0.17058978780113035}
+    // res = (-0.30508130938414506, -0.3434959521016236, -0.4203252375365800)
+
+    RGBColorF attenuation = {
+        .r = 0,
+        .g = 0,
+        .b = 0
+    };
+
+    Ray out = {
+        .origin = {
+            .x = 0,
+            .y = 0,
+            .z = 0
+        },
+
+        .direction = {
+            .x = 1.0,
+            .y = 4.0,
+            .z = 3.0
+        }
+    };
+
+    Ray exp_out = {
+
+        .origin = {
+            .x = 4.0,
+            .y = 3.0, 
+            .z = 2.0 
+        },
+
+        .direction = {
+            .x = -0.30508130938414506,
+            .y = -0.3434959521016236,
+            .z = -0.4203252375365800
+        }        
+    };
+
+    RGBColorF exp_attenuation = {
+        .r = 1.0,
+        .g = 1.0,
+        .b = 1.0
+    };
+
+
+    bool b = mat_scatter(&rayIn, &rec, &attenuation, &out);
+
+    ck_assert_int_eq(1, b);
+    ck_assert_colorf_eq(exp_attenuation, attenuation);
+    ck_assert_ld_vec3_eq(exp_out.origin, out.origin);
+    ck_assert_ld_vec3_eq(exp_out.direction, out.direction);
+
+}END_TEST
+
 Suite* util_suite(void)
 {
     Suite *s;
@@ -469,7 +605,8 @@ Suite* util_suite(void)
     tcase_add_test(tc_core, check_material_lambertian);
     tcase_add_test(tc_core, check_material_metal_true);
     tcase_add_test(tc_core, check_material_metal_false);
-    tcase_add_test(tc_core, check_material_dielectric);
+    tcase_add_test(tc_core, check_material_dielectric_reflect);
+    tcase_add_test(tc_core, check_material_dielectric_refract);
 
     return s;
 }
