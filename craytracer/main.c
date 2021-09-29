@@ -17,12 +17,13 @@
 #include "hypatiaINC.h"
 #include "ray.h"
 #include "material.h"
+#include "color.h"
 #include "poolAllocator.h"
 
-vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
-    CFLOAT r = pixel_color.x;
-    CFLOAT g = pixel_color.y;
-    CFLOAT b = pixel_color.z;
+RGBColorU8 writeColor(RGBColorF pixel_color, int sample_per_pixel){
+    CFLOAT r = pixel_color.r;
+    CFLOAT g = pixel_color.g;
+    CFLOAT b = pixel_color.b;
 
     CFLOAT scale = 1.0/sample_per_pixel;
 
@@ -30,13 +31,7 @@ vec3 writeColor(vec3 pixel_color, int sample_per_pixel){
     g = sqrt(scale * g);
     b = sqrt(scale * b);
 
-    vec3 temp;
-    
-    vector3_setf3(&temp, 255.999 * util_floatClamp(r,0.0,0.999),
-                         255.999 * util_floatClamp(g,0.0,0.999),
-                         255.999 * util_floatClamp(b,0.0,0.999));
-
-    return temp;
+    return COLOR_U8CREATE(r, g, b);
 }
 
 HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, PoolAlloc * restrict hrAlloc, CFLOAT t_min, CFLOAT t_max){
@@ -55,24 +50,26 @@ HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, PoolAlloc * restrict h
     return h;
 }
 
-vec3 ray_c(Ray r, int n, Sphere sphere[n], int depth, PoolAlloc * restrict hrAlloc){
+
+RGBColorF ray_c(Ray r, int n, Sphere sphere[n], int depth, PoolAlloc * restrict hrAlloc){
     if(depth <= 0){
-        return (vec3){0};
+        return (RGBColorF){0};
     }
 
     HitRecord *  rec = hittableList(n, sphere, r, hrAlloc, 0.1, FLT_MAX);
     if(rec != NULL){
         Ray scattered = {0};
-        vec3 attenuation = {0};
+        RGBColorF attenuation = {0};
         
         if(mat_scatter(&r, rec, &attenuation, &scattered)){
-            vec3 color = ray_c(scattered, n, sphere, depth - 1, hrAlloc);
-            vector3_multiply(&color, &attenuation);
+            RGBColorF color = ray_c(scattered, n, sphere, depth - 1, hrAlloc);
+            color = colorf_multiply(color, attenuation); 
+
             
             return color;
         }
 
-        return (vec3){0};
+        return (RGBColorF){0};
     }
 
     vec3 ud = r.direction;
@@ -84,7 +81,11 @@ vec3 ray_c(Ray r, int n, Sphere sphere[n], int depth, PoolAlloc * restrict hrAll
     vector3_setf3(&inter3, 0.5 * t, 0.7 * t, 1.0 * t);
     vector3_add(&inter3, &inter4);
     
-    return inter3;
+    return (RGBColorF){
+        .r = inter3.x,
+        .g = inter3.y,
+        .b = inter3.z
+    };
 }
         
 void printProgressBar(int i, int max){
@@ -123,24 +124,22 @@ int main(int argc, char *argv[]){
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
-    
-    vec3* image = (vec3*) malloc(sizeof(vec3) * HEIGHT * WIDTH);
 
     LambertianMat materialGround = {
-        .albedo = {.x = 0.8, .y = 0.8, .z = 0.0}
+        .albedo = {.r = 0.8, .g = 0.8, .b = 0.0}
     };
 
     LambertianMat materialCenter = {
-        .albedo = {.x = 0.7, .y = 0.3, .z = 0.3}
+        .albedo = {.r = 0.7, .g = 0.3, .b = 0.3}
     }; 
 
     MetalMat materialLeft = {
-        .albedo = {.x = 0.8, .y = 0.8, .z = 0.8},
-        .fuzz = 0.0
+        .albedo = {.r = 0.8, .g = 0.8, .b = 0.8},
+        .fuzz = 0.3
     };
     MetalMat materialRight = {
-        .albedo = {.x = 0.8, .y = 0.6,.z = 0.2},
-        .fuzz = 0.0
+        .albedo = {.r = 0.8, .g = 0.6,.b = 0.2},
+        .fuzz = 1.0
     }; 
 
 
@@ -185,30 +184,29 @@ int main(int argc, char *argv[]){
 
     cam_setCamera(&c);
 
-    vec3 pixel_color;
+    RGBColorF pixel_color;
     Ray r;
-    vec3 temp;
+    RGBColorF temp;
     
+    RGBColorU8* image = (RGBColorU8*) malloc(sizeof(RGBColorF) * HEIGHT * WIDTH);
     PoolAlloc * hrpa = alloc_createPoolAllocator(sizeof(HitRecord) * MAX_DEPTH * SAMPLES_PER_PIXEL * 2, alignof(HitRecord), sizeof(HitRecord)); 
 
     for (int j = HEIGHT - 1; j >= 0; j--){
-
         for (int i = 0; i < WIDTH; i++){
 
-            vector3_zero(&pixel_color);
+            pixel_color = (RGBColorF){.r = 0.0, .g = 0.0, .b = 0.0};
 
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
                 CFLOAT u = ((CFLOAT)i + util_randomFloat(0.0, 1.0)) / (WIDTH - 1);
                 CFLOAT v = ((CFLOAT)j + util_randomFloat(0.0, 1.0)) / (HEIGHT - 1);
                 r = cam_getRay(&c, u, v);
-                temp = ray_c(r, 4, s, MAX_DEPTH, hrpa);
-                vector3_add(&pixel_color, &temp);    
-
+              
+                temp = ray_c(r, 4, s, MAX_DEPTH);
+                pixel_color = colorf_add(pixel_color, temp);   
             }
 
-            temp = writeColor(pixel_color, SAMPLES_PER_PIXEL);
-            vector3_set(&image[i + WIDTH * (HEIGHT - 1 - j)], &temp);
-            alloc_poolAllocFreeAll(hrpa); 
+            image[i + WIDTH * (HEIGHT - 1 - j)] = writeColor(pixel_color, SAMPLES_PER_PIXEL);
+            alloc_poolAllocFreeAll(hrpa);
         }
 
         printProgressBar(HEIGHT - 1 - j, HEIGHT - 1);

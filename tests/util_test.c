@@ -105,6 +105,20 @@ START_TEST(check_util_near_zero_incorr){
     ck_assert_int_eq(b, 0);
 }END_TEST
 
+START_TEST(check_uint8_clamp_1){
+    ck_assert_float_eq(util_uint8Clamp(9, 6, 8), 8);
+}
+END_TEST
+
+START_TEST(check_uint8_clamp_2){
+    ck_assert_float_eq(util_uint8Clamp(5, 6, 8), 6);
+}
+END_TEST
+
+START_TEST(check_uint8_clamp_3){
+    ck_assert_float_eq(util_uint8Clamp(7, 6, 8), 7);
+}
+END_TEST
 
 Suite* util_suite(void)
 {
@@ -125,6 +139,9 @@ Suite* util_suite(void)
     tcase_add_test(tc_core, check_util_h_7);
     tcase_add_test(tc_core, check_util_near_zero_corr);
     tcase_add_test(tc_core, check_util_near_zero_incorr);
+    tcase_add_test(tc_core, check_uint8_clamp_1);
+    tcase_add_test(tc_core, check_uint8_clamp_2);
+    tcase_add_test(tc_core, check_uint8_clamp_3);
 
     suite_add_tcase(s, tc_core);
 
