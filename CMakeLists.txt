@@ -8,6 +8,8 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
 set(LIB_NAME ${CMAKE_PROJECT_NAME}lib)
+set(DBG_LIB_NAME ${LIB_NAME}_dbg)
+
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/craytracer)
 
 include_directories(libs/include)

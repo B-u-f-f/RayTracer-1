@@ -63,5 +63,5 @@ bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, ve
         return mat_lambScatter((LambertianMat * ) m->matLamb, rec, attenuation, out);
     }
 
-    assert(0);
+    return false;
 }

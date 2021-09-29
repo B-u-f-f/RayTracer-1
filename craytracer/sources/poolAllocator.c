@@ -5,14 +5,16 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdalign.h>
 
 #define ALIGNED_MALLOC(alignment, size) aligned_alloc((alignment), (size))
 #define CUSTOM_MALLOC(size) malloc((size))
 
-
+#ifndef NDEBUG
 static bool isPowerOfTwo(uintptr_t align){
     return (align & (align - 1)) == 0;
 }
+#endif 
 
 static uint32_t alignSizeForward(uint32_t size, uint16_t align){
     assert(isPowerOfTwo(align) && "align is not a power of two");
@@ -31,8 +33,8 @@ PoolAlloc* alloc_createPoolAllocator(uint32_t size, uint16_t chunkAlignment, uin
     
     uint32_t chunkCount = size / chunkSize;
 
-    if(chunkAlignment < 8){
-        chunkAlignment = 8;
+    if(chunkAlignment < alignof(PoolAllocNode)){
+        chunkAlignment = alignof(PoolAllocNode);
     }
     
     // align the size 
@@ -64,14 +66,18 @@ void * alloc_poolAllocAllocate(PoolAlloc * restrict pa){
     PoolAllocNode * node = pa->head;
     if(node == NULL){
 
-        printf("%u\n", pa->allocated_chunks);
+#ifndef NDEBUG
+        printf("%u\n", pa->dbgS.allocatedChunks);
+#endif
         assert(0 && "Pool allocator is empty");
         return NULL;
     }
 
     pa->head = pa->head->next;
-    
-    pa->allocated_chunks += 1;
+
+#ifndef NDEBUG
+    pa->dbgS.allocatedChunks += 1;
+#endif
     // zero the memory and return it 
     return memset(node, 0, pa->chunkSize);
 }
@@ -93,7 +99,9 @@ void alloc_poolAllocFree(PoolAlloc * restrict pa, void * restrict ptr){
     node->next = pa->head;
     pa->head = node;
 
-    pa->allocated_chunks -= 1;
+#ifndef NDEBUG
+    pa->dbgS.allocatedChunks -= 1;
+#endif
 }
 
 void alloc_poolAllocFreeAll(PoolAlloc * restrict pa){
@@ -106,12 +114,12 @@ void alloc_poolAllocFreeAll(PoolAlloc * restrict pa){
         pa->head = node;
     }
 
-    pa->allocated_chunks = 0;
+#ifndef NDEBUG
+    pa->dbgS.allocatedChunks = 0;
+#endif
 } 
 
 extern void alloc_freePoolAllocator(PoolAlloc * restrict pAlloc){
     free(pAlloc->buffptr);
     free(pAlloc);
 }
-
-

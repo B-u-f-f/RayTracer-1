@@ -11,7 +11,7 @@ foreach(TEST ${TEST_SRC_FILES})
 
     add_test(NAME ${BINARY} COMMAND ${BINARY})
 
-    target_link_libraries(${BINARY} m ${LIB_NAME} CONAN_PKG::libcheck)
+    target_link_libraries(${BINARY} m ${DBG_LIB_NAME} CONAN_PKG::libcheck)
 
     target_compile_options(${BINARY} PUBLIC -Wall -Werror -Wpedantic -Wextra -g)
     target_include_directories(${BINARY} PUBLIC ${SOURCE_DIR}/include)

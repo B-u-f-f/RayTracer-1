@@ -4,6 +4,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifndef NDEBUG
+typedef struct debugStruct {
+    uint32_t allocatedChunks;
+} DebugStruct;
+#endif
 
 typedef struct poolAllocNode PoolAllocNode;
 typedef struct poolAllocNode{
@@ -19,10 +24,11 @@ typedef struct poolalloc {
 
     // size of each chunk
     uint32_t chunkSize;
-
-    // num chunks allocated
-    uint32_t allocated_chunks;
     
+    // information for debugging
+#ifndef NDEBUG
+    DebugStruct dbgS;
+#endif 
     // points to the first node in the free list
     PoolAllocNode * restrict head;
 
