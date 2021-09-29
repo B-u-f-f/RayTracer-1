@@ -20,11 +20,7 @@
 #include "color.h"
 #include "poolAllocator.h"
 
-RGBColorU8 writeColor(RGBColorF pixel_color, int sample_per_pixel){
-    CFLOAT r = pixel_color.r;
-    CFLOAT g = pixel_color.g;
-    CFLOAT b = pixel_color.b;
-
+RGBColorU8 writeColor(CFLOAT r, CFLOAT g, CFLOAT b, int sample_per_pixel){
     CFLOAT scale = 1.0/sample_per_pixel;
 
     r = sqrt(scale * r);
@@ -42,9 +38,15 @@ HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, PoolAlloc * restrict h
         hit(sphere + i, ray, t_min, t_max, r);
 
         if(r->valid){
-            alloc_poolAllocFree(hrAlloc, h);
-            h = r;
-            r = (HitRecord *) alloc_poolAllocAllocate(hrAlloc);
+
+            if(h == NULL ){
+                h = r;
+                r = (HitRecord *) alloc_poolAllocAllocate(hrAlloc);
+            }else if(r->distanceFromOrigin < h->distanceFromOrigin){
+                alloc_poolAllocFree(hrAlloc, h);
+                h = r;
+                r = (HitRecord *) alloc_poolAllocAllocate(hrAlloc);
+            }
         }
     }    
     return h;
@@ -56,7 +58,7 @@ RGBColorF ray_c(Ray r, int n, Sphere sphere[n], int depth, PoolAlloc * restrict 
         return (RGBColorF){0};
     }
 
-    HitRecord *  rec = hittableList(n, sphere, r, hrAlloc, 0.1, FLT_MAX);
+    HitRecord *  rec = hittableList(n, sphere, r, hrAlloc, 0.00001, FLT_MAX);
     if(rec != NULL){
         Ray scattered = {0};
         RGBColorF attenuation = {0};
@@ -130,37 +132,43 @@ int main(int argc, char *argv[]){
     };
 
     LambertianMat materialCenter = {
-        .albedo = {.r = 0.7, .g = 0.3, .b = 0.3}
+        .albedo = {.r = 0.1, .g = 0.2, .b = 0.5}
     }; 
 
-    MetalMat materialLeft = {
-        .albedo = {.r = 0.8, .g = 0.8, .b = 0.8},
-        .fuzz = 0.3
+    DielectricMat materialLeft = {
+        .ir = 1.5
     };
+
     MetalMat materialRight = {
         .albedo = {.r = 0.8, .g = 0.6,.b = 0.2},
-        .fuzz = 1.0
+        .fuzz = 0.0
     }; 
 
+#define numSpheres 5
 
-    Sphere  s[4] = {
+    Sphere s[numSpheres] = {
         {
         .center = { .x = 0.0, .y = -100.5, .z = -1.0},
         .radius = 100,
         .sphMat = {.matLamb = &materialGround, .matType = LAMBERTIAN },
-        },
-           
+        }, 
+        
         {
         .center = {.x = -1.0, .y = 0.0, .z = -1.0},
         .radius = 0.5,
-        .sphMat = {.matMetal = &materialLeft, .matType = METAL},
+        .sphMat = {.matDielectric = &materialLeft, .matType = DIELECTRIC },
         },
-        
+
+        {
+        .center = {.x = -1.0, .y = 0.0, .z = -1.0},
+        .radius = -0.4,
+        .sphMat = {.matDielectric = &materialLeft, .matType = DIELECTRIC },
+        },
+
         {
         .center = {.x = 1.0, .y = 0.0, .z = -1.0},
-        
         .radius = 0.5,
-        .sphMat = {.matMetal = &materialRight, .matType = METAL},
+        .sphMat = {.matMetal = &materialRight, .matType = METAL },
         },
 
         {
@@ -184,28 +192,32 @@ int main(int argc, char *argv[]){
 
     cam_setCamera(&c);
 
-    RGBColorF pixel_color;
     Ray r;
     RGBColorF temp;
     
     RGBColorU8* image = (RGBColorU8*) malloc(sizeof(RGBColorF) * HEIGHT * WIDTH);
     PoolAlloc * hrpa = alloc_createPoolAllocator(sizeof(HitRecord) * MAX_DEPTH * SAMPLES_PER_PIXEL * 2, alignof(HitRecord), sizeof(HitRecord)); 
 
+    CFLOAT pcR, pcG, pcB;
+
     for (int j = HEIGHT - 1; j >= 0; j--){
         for (int i = 0; i < WIDTH; i++){
-
-            pixel_color = (RGBColorF){.r = 0.0, .g = 0.0, .b = 0.0};
+            
+            pcR = pcG = pcB = 0.0;
 
             for(int k = 0; k < SAMPLES_PER_PIXEL; k++){
                 CFLOAT u = ((CFLOAT)i + util_randomFloat(0.0, 1.0)) / (WIDTH - 1);
                 CFLOAT v = ((CFLOAT)j + util_randomFloat(0.0, 1.0)) / (HEIGHT - 1);
                 r = cam_getRay(&c, u, v);
               
-                temp = ray_c(r, 4, s, MAX_DEPTH);
-                pixel_color = colorf_add(pixel_color, temp);   
+                temp = ray_c(r, numSpheres, s, MAX_DEPTH, hrpa);
+
+                pcR += temp.r;
+                pcG += temp.g;
+                pcB += temp.b;   
             }
 
-            image[i + WIDTH * (HEIGHT - 1 - j)] = writeColor(pixel_color, SAMPLES_PER_PIXEL);
+            image[i + WIDTH * (HEIGHT - 1 - j)] = writeColor(pcR, pcG, pcB, SAMPLES_PER_PIXEL);
             alloc_poolAllocFreeAll(hrpa);
         }
 

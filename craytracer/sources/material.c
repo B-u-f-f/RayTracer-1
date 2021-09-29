@@ -6,6 +6,13 @@
 #include "ray.h"
 #include "types.h"
 
+static CFLOAT reflectance(CFLOAT cosine, CFLOAT ref_idx){
+    //using schlik's approximation
+    CFLOAT r0 = (1-ref_idx)/(1+ref_idx);
+    r0 *= r0;
+
+    return r0 + (1-r0) * pow((1 - cosine), 5);
+}
 
 static bool mat_metalScatter(const MetalMat * restrict nmetalMat, 
                              const Ray * restrict rayIn, 
@@ -64,26 +71,24 @@ static bool mat_dielectricScatter(const DielectricMat * restrict ndielectricMat,
     };
 
     CFLOAT refraction_ratio = rec->frontFace ? (1.0/ndielectricMat->ir) : ndielectricMat->ir;
+    
+    vec3 negate_rayIn_direction = rayIn->direction;
+    vector3_negate(&negate_rayIn_direction);
+    CFLOAT cos_theta = CF_MIN(vector3_dot_product(&negate_rayIn_direction, &rec->normal), 1.0);
+    CFLOAT sin_theta = sqrt(1 - cos_theta*cos_theta);
 
-    // vec3 negate_rayIn_direction = vector3_negate(&rayIn->direction);
-    // CFLOAT cos_theta = CF_MIN(vector3_dot_product(&negate_rayIn_direction, &rec->normal), 1.0);
-    // CFLOAT sin_theta = sqrt(1 - cos_theta*cos_theta);
+    bool cannot_refract = (refraction_ratio * sin_theta) > 1.0;
+    vec3 direction;
 
-    // bool cannot_refract = (refraction_ratio * sin_theta) > 1.0;
-    // vec3 direction;
-
-    // if(cannot_refract){
-    //     direction = util_vec3Reflect(rayIn->direction, rec->normal);
-    // }else{
-    //     direction = util_vec3Refract(rayIn->direction, rec->normal, refraction_ratio);
-    // }
-
-    vec3 refracted = util_vec3Refract(rayIn->direction, rec->normal, refraction_ratio);
-
+    if(cannot_refract || reflectance(cos_theta, refraction_ratio) > util_randomFloat(0.0, 1.0)){
+        direction = util_vec3Reflect(rayIn->direction, rec->normal);
+    }else{
+        direction = util_vec3Refract(rayIn->direction, rec->normal, refraction_ratio);
+    }
 
     Ray r = {
         .origin = rec->point,
-        .direction = refracted
+        .direction = direction
     };
 
     *out = r;
@@ -105,3 +110,5 @@ bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, RG
 
     return false;
 }
+
+
