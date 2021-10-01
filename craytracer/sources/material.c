@@ -101,11 +101,11 @@ bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, RG
     const Material * restrict m = rec->hitObjMat;
 
     if(m->matType == METAL){
-        return mat_metalScatter((MetalMat * ) m->matMetal, rayIn, rec, attenuation, out);
+        return mat_metalScatter((MetalMat * ) m->mat, rayIn, rec, attenuation, out);
     }else if(m->matType == DIELECTRIC){
-        return mat_dielectricScatter((DielectricMat * ) m->matDielectric, rayIn, rec, attenuation, out);
+        return mat_dielectricScatter((DielectricMat * ) m->mat, rayIn, rec, attenuation, out);
     }else if (m->matType == LAMBERTIAN){
-        return mat_lambScatter((LambertianMat * ) m->matLamb, rec, attenuation, out);
+        return mat_lambScatter((LambertianMat * ) m->mat, rec, attenuation, out);
     }
 
     return false;

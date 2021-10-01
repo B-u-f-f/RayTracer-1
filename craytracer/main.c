@@ -125,10 +125,7 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
     spheres[i] = (Sphere){
         .center = {.x = 0, .y = -1000, .z = 0},
         .radius = 1000,
-        .sphMat = {
-            .matLamb = materialGround,
-            .matType = LAMBERTIAN
-        }
+        .sphMat = MAT_CREATE_LAMB_IP(materialGround) 
     };
 
     i += 1;
@@ -160,7 +157,7 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
                     spheres[i] = (Sphere) {
                         .center = center,
                         .radius = 0.2,
-                        .sphMat = {.matLamb = lambMat, .matType = LAMBERTIAN }
+                        .sphMat = MAT_CREATE_LAMB_IP(lambMat) 
                     };
 
                     i += 1;
@@ -180,7 +177,7 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
                     spheres[i] = (Sphere) {
                         .center = center,
                         .radius = 0.2,
-                        .sphMat = {.matMetal = metalMat, .matType = METAL }
+                        .sphMat = MAT_CREATE_METAL_IP(metalMat) 
                     };
 
                     i += 1;
@@ -191,7 +188,7 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
                     spheres[i] = (Sphere) {
                         .center = center,
                         .radius = 0.2,
-                        .sphMat = {.matDielectric = dMat, .matType = DIELECTRIC }
+                        .sphMat = MAT_CREATE_DIELECTRIC_IP(dMat)
                     };
 
                     i += 1;
@@ -207,10 +204,7 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
     spheres[i] = (Sphere){
         .center = {.x = 0, .y = 1, .z = 0},
         .radius = 1.0,
-        .sphMat = {
-            .matDielectric = material1,
-            .matType = DIELECTRIC
-        }
+        .sphMat = MAT_CREATE_DIELECTRIC_IP(material1) 
     };
 
     i += 1;
@@ -223,10 +217,7 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
     spheres[i] = (Sphere){
         .center = {.x = -4, .y = 1, .z = 0},
         .radius = 1.0,
-        .sphMat = {
-            .matLamb = material2,
-            .matType = LAMBERTIAN
-        }
+        .sphMat = MAT_CREATE_LAMB_IP(material2) 
     };
         
     i += 1;
@@ -240,10 +231,7 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
     spheres[i] = (Sphere){
         .center = {.x = 4, .y = 1, .z = 0},
         .radius = 1.0,
-        .sphMat = {
-            .matMetal = material3,
-            .matType = METAL
-        }
+        .sphMat = MAT_CREATE_METAL_IP(material3) 
     };
 
     i += 1;
