@@ -17,7 +17,7 @@ void cam_setCamera(Camera * restrict c, vec3 origin, CFLOAT aspectRatio,
 
     c->verticalFOV = degreesToRadians(vfov); 
 
-    c->viewportHeight = 2.0 * tanf(c->verticalFOV / 2.0); 
+    c->viewportHeight = 2.0 * tan(c->verticalFOV / 2.0);
     c->viewportWidth = c->aspectRatio * c->viewportHeight;
 
     c->vertical.y = c->viewportHeight;
@@ -37,7 +37,7 @@ void cam_setLookAtCamera(Camera * restrict c, vec3 lookFrom,
 
     c->verticalFOV = degreesToRadians(vfov);
 
-    c->viewportHeight = 2.0 * tanf(c->verticalFOV / 2.0); 
+    c->viewportHeight = 2.0 * tan(c->verticalFOV / 2.0); 
     c->viewportWidth = c->aspectRatio * c->viewportHeight;
     
     // w = dir(lookFrom - lookAt)
@@ -61,7 +61,6 @@ void cam_setLookAtCamera(Camera * restrict c, vec3 lookFrom,
     
     // vertical = focusDist * viewport_height * v
     c->vertical = c->v;
-    vector3_multiplyf(&c->vertical, c->viewportHeight);
     vector3_multiplyf(&c->vertical, c->viewportHeight * focusDist);
     
     // lower_left_corner = origin - (horizontal + vertical)/2 - w * focusDist
