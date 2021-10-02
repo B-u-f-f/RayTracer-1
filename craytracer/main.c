@@ -18,7 +18,7 @@
 #include "ray.h"
 #include "material.h"
 #include "color.h"
-#include "poolAllocator.h"
+#include "allocator.h"
 
 RGBColorU8 writeColor(CFLOAT r, CFLOAT g, CFLOAT b, int sample_per_pixel){
     CFLOAT scale = 1.0/sample_per_pixel;
@@ -30,8 +30,8 @@ RGBColorU8 writeColor(CFLOAT r, CFLOAT g, CFLOAT b, int sample_per_pixel){
     return COLOR_U8CREATE(r, g, b);
 }
 
-HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, PoolAlloc * restrict hrAlloc, CFLOAT t_min, CFLOAT t_max){
-    HitRecord * r = (HitRecord *) alloc_poolAllocAllocate(hrAlloc);
+HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, LinearAllocFC * restrict hrAlloc, CFLOAT t_min, CFLOAT t_max){
+    HitRecord * r = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
     HitRecord * h = NULL;
 
     for(int i = 0; i < n; i++){
@@ -41,11 +41,11 @@ HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, PoolAlloc * restrict h
 
             if(h == NULL ){
                 h = r;
-                r = (HitRecord *) alloc_poolAllocAllocate(hrAlloc);
+                r = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
             }else if(r->distanceFromOrigin < h->distanceFromOrigin){
-                alloc_poolAllocFree(hrAlloc, h);
+                // alloc_poolAllocFree(hrAlloc, h);
                 h = r;
-                r = (HitRecord *) alloc_poolAllocAllocate(hrAlloc);
+                r = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
             }
         }
     }    
@@ -53,7 +53,7 @@ HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, PoolAlloc * restrict h
 }
 
 
-RGBColorF ray_c(Ray r, int n, Sphere sphere[n], int depth, PoolAlloc * restrict hrAlloc){
+RGBColorF ray_c(Ray r, int n, Sphere sphere[n], int depth, LinearAllocFC * restrict hrAlloc){
     if(depth <= 0){
         return (RGBColorF){0};
     }
@@ -111,13 +111,16 @@ void printProgressBar(int i, int max){
 
 #define randomFloat() util_randomFloat(0.0, 1.0)
 
-void randomSpheres(int n, Sphere spheres[n], int * out){
+void randomSpheres(int n, Sphere spheres[n], int * out, DynamicStackAlloc * dsa){
+
     if(n < 500){
         return;
     }
 
     int i = 0;
-    LambertianMat* materialGround = malloc(sizeof(LambertianMat));
+    LambertianMat* materialGround = alloc_dynamicStackAllocAllocate(dsa, 
+                                    sizeof(LambertianMat), 
+                                    alignof(LambertianMat));
     materialGround->albedo.r = 0.5;
     materialGround->albedo.g = 0.5;
     materialGround->albedo.b = 0.5;
@@ -152,7 +155,10 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
                         .b = randomFloat() * randomFloat(),
                     };
 
-                    LambertianMat* lambMat = malloc(sizeof(LambertianMat));
+                    LambertianMat* lambMat = alloc_dynamicStackAllocAllocate(dsa, 
+                                            sizeof(LambertianMat), 
+                                            alignof(LambertianMat));
+
                     lambMat->albedo = albedo;
                     spheres[i] = (Sphere) {
                         .center = center,
@@ -170,7 +176,10 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
                     };
                     CFLOAT fuzz = util_randomFloat(0.5, 1.0);
                         
-                    MetalMat* metalMat = malloc(sizeof(MetalMat));
+                    MetalMat* metalMat = alloc_dynamicStackAllocAllocate(dsa, 
+                                         sizeof(MetalMat), 
+                                         alignof(MetalMat));
+
                     metalMat->albedo = albedo;
                     metalMat->fuzz = fuzz;
 
@@ -183,7 +192,9 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
                     i += 1;
  
                 }else{
-                    DielectricMat * dMat = malloc(sizeof(DielectricMat));
+                    DielectricMat * dMat = alloc_dynamicStackAllocAllocate(dsa, 
+                                           sizeof(DielectricMat), 
+                                           alignof(DielectricMat));
                     dMat->ir = 0.5;
                     spheres[i] = (Sphere) {
                         .center = center,
@@ -198,7 +209,9 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
         }
     }
 
-    DielectricMat* material1 = malloc(sizeof(DielectricMat));
+    DielectricMat* material1 = alloc_dynamicStackAllocAllocate(dsa, 
+                                           sizeof(DielectricMat), 
+                                           alignof(DielectricMat));    
     material1->ir = 1.5;
 
     spheres[i] = (Sphere){
@@ -209,7 +222,9 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
 
     i += 1;
     
-    LambertianMat* material2 = malloc(sizeof(LambertianMat));
+    LambertianMat* material2 = alloc_dynamicStackAllocAllocate(dsa, 
+                                           sizeof(LambertianMat), 
+                                           alignof(LambertianMat));    
     material2->albedo.r = 0.4;
     material2->albedo.g = 0.2;
     material2->albedo.b = 0.1;
@@ -222,7 +237,9 @@ void randomSpheres(int n, Sphere spheres[n], int * out){
         
     i += 1;
 
-    MetalMat* material3 = malloc(sizeof(MetalMat));
+    MetalMat* material3 = alloc_dynamicStackAllocAllocate(dsa, 
+                                       sizeof(MetalMat), 
+                                       alignof(MetalMat));     
     material3->albedo.r = 0.7;
     material3->albedo.g = 0.6;
     material3->albedo.b = 0.5;
@@ -252,10 +269,11 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 3.0 / 2.0;
-    const int WIDTH = 500;
+    const int WIDTH = 50;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
     const int SAMPLES_PER_PIXEL = 10;
     const int MAX_DEPTH = 10;
+
 /*    
     LambertianMat materialGround = {
         .albedo = {.r = 0.8, .g = 0.8, .b = 0.0}
@@ -309,11 +327,12 @@ int main(int argc, char *argv[]){
     };
 */    
 
+    DynamicStackAlloc * dsa = alloc_createDynamicStackAllocD(1024, 100);
 
     Sphere *s = malloc(500 * sizeof(Sphere));
     int numSpheres = 0;
     
-    randomSpheres(500, s, &numSpheres);
+    randomSpheres(500, s, &numSpheres, dsa);
 
     Camera c;
     cam_setLookAtCamera(&c, 
@@ -326,7 +345,8 @@ int main(int argc, char *argv[]){
     RGBColorF temp;
     
     RGBColorU8* image = (RGBColorU8*) malloc(sizeof(RGBColorF) * HEIGHT * WIDTH);
-    PoolAlloc * hrpa = alloc_createPoolAllocator(sizeof(HitRecord) * MAX_DEPTH * SAMPLES_PER_PIXEL * 2, alignof(HitRecord), sizeof(HitRecord)); 
+//    PoolAlloc * hrpa = alloc_createPoolAllocator(sizeof(HitRecord) * MAX_DEPTH * SAMPLES_PER_PIXEL * 2, alignof(HitRecord), sizeof(HitRecord)); 
+    LinearAllocFC * lafc = alloc_createLinearAllocFC(MAX_DEPTH * numSpheres, sizeof(HitRecord), alignof(HitRecord));
 
     CFLOAT pcR, pcG, pcB;
 
@@ -340,15 +360,17 @@ int main(int argc, char *argv[]){
                 CFLOAT v = ((CFLOAT)j + util_randomFloat(0.0, 1.0)) / (HEIGHT - 1);
                 r = cam_getRay(&c, u, v);
               
-                temp = ray_c(r, numSpheres, s, MAX_DEPTH, hrpa);
+                temp = ray_c(r, numSpheres, s, MAX_DEPTH, lafc);
 
                 pcR += temp.r;
                 pcG += temp.g;
                 pcB += temp.b;   
+
+                alloc_linearAllocFCFreeAll(lafc);
             }
 
             image[i + WIDTH * (HEIGHT - 1 - j)] = writeColor(pcR, pcG, pcB, SAMPLES_PER_PIXEL);
-            alloc_poolAllocFreeAll(hrpa);
+//            alloc_poolAllocFreeAll(hrpa);
         }
 
         printProgressBar(HEIGHT - 1 - j, HEIGHT - 1);
@@ -357,7 +379,9 @@ int main(int argc, char *argv[]){
     writeToPPM(argv[1], WIDTH, HEIGHT, image);
     free(image);
     free(s);
-    alloc_freePoolAllocator(hrpa);
-
+    
+//    alloc_freePoolAllocator(hrpa);
+    alloc_freeLinearAllocFC(lafc);
+    alloc_freeDynamicStackAllocD(dsa);
     return 0;
 }
