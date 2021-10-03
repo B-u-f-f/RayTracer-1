@@ -20,9 +20,10 @@ extern vec3 util_randomUnitVector();
 extern CFLOAT util_randomFloat(CFLOAT lower, CFLOAT upper);
 
 extern vec3 util_vec3Reflect(vec3 v,vec3 n);
-extern vec3 util_vec3Refract(vec3 uv, vec3 n, CFLOAT etai_over_etat);
 
 extern bool util_isVec3Zero(vec3 v);
+
+extern vec3 util_randomUnitDisk();
 
 #endif
 
