@@ -14,6 +14,36 @@ static CFLOAT reflectance(CFLOAT cosine, CFLOAT ref_idx){
     return r0 + (1-r0) * pow((1 - cosine), 5);
 }
 
+static vec3 util_vec3Refract(vec3 uv, vec3 n, CFLOAT etai_over_etat){
+    // negate the incoming ray
+    vec3 negate_uv = uv;
+    vector3_negate(&negate_uv);
+    
+    // finding cos-theta for uv and n
+    CFLOAT cos_theta = CF_MIN(vector3_dot_product(&negate_uv, &n), 1.0);
+    
+    
+    vec3 r_out_perp = n;    
+    // multiply normal with cos 
+    vector3_multiplyf(&r_out_perp, cos_theta);
+    // add with above
+    vector3_add(&r_out_perp, &uv);
+    vector3_multiplyf(&r_out_perp, etai_over_etat);
+    
+    CFLOAT r_out_perp_length_squared = (r_out_perp.x*r_out_perp.x + r_out_perp.y*r_out_perp.y + r_out_perp.z*r_out_perp.z);
+
+    r_out_perp_length_squared = 1.0 - r_out_perp_length_squared;
+    r_out_perp_length_squared = fabs(r_out_perp_length_squared);
+    r_out_perp_length_squared = - sqrt(r_out_perp_length_squared);
+
+    vec3 r_out_parallel = n;
+    vector3_multiplyf(&r_out_parallel, r_out_perp_length_squared);
+
+    vector3_add(&r_out_perp, &r_out_parallel);
+
+    return r_out_perp;
+}
+
 static bool mat_metalScatter(const MetalMat * restrict nmetalMat, 
                              const Ray * restrict rayIn, 
                              const HitRecord * restrict rec, 
