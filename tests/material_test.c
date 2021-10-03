@@ -35,9 +35,7 @@ START_TEST(check_material_lambertian){
     };
 
     Material ma = {
-        .matLamb = &t_lmat,
-        .matMetal = NULL,
-        .matDielectric = NULL,
+        .mat = &t_lmat,
         .matType = LAMBERTIAN,
     };
 
@@ -149,9 +147,7 @@ START_TEST (check_material_metal_true){
     // nrml = (-0.670120332634210, -0.289656507793361, -0.683401673456519)
     
     Material ma = {
-            .matLamb = NULL,
-            .matMetal = &nmetalMat,
-            .matDielectric = NULL,
+            .mat = &nmetalMat,
             .matType = METAL
     };
 
@@ -262,9 +258,7 @@ START_TEST (check_material_metal_false) {
     // nrml = (0.335262370437306, 0.88552313388426, 0.321633210854460)
 
     Material ma = {
-        .matLamb = NULL,
-        .matMetal = &nmetalMat,
-        .matDielectric = NULL,
+        .mat = &nmetalMat,
         .matType = METAL
     };
 
@@ -371,9 +365,7 @@ START_TEST(check_material_dielectric_reflect){
     };
 
     Material ma = {
-        .matLamb = NULL,
-        .matMetal = NULL,
-        .matDielectric = &ndielectricMat,
+        .mat = &ndielectricMat,
         .matType = DIELECTRIC
     };
 
@@ -497,9 +489,7 @@ START_TEST(check_material_dielectric_refract){
     };
 
     Material ma = {
-        .matLamb = NULL,
-        .matMetal = NULL,
-        .matDielectric = &ndielectricMat,
+        .mat = &ndielectricMat,
         .matType = DIELECTRIC
     };
 
@@ -592,6 +582,69 @@ START_TEST(check_material_dielectric_refract){
 
 }END_TEST
 
+
+START_TEST(check_material_create_lambertian)
+{
+    LambertianMat lm = {
+        .albedo = {.r = 0.5, .b = .03, .g = 0.7}
+    };
+
+
+    Material m1 = MAT_CREATE_LAMB_IP(&lm);
+    Material m2;
+    m2 = MAT_CREATE_LAMB(&lm);
+    
+    ck_assert_ptr_eq(m2.mat, &lm);
+    ck_assert_int_eq(m2.matType, LAMBERTIAN);
+
+    ck_assert_ptr_eq(m1.mat, &lm);
+    ck_assert_int_eq(m1.matType, LAMBERTIAN);
+
+}
+END_TEST
+
+START_TEST(check_material_create_metal)
+{
+    MetalMat mm = {
+        .albedo = {.r = 0.5, .b = .03, .g = 0.7},
+        .fuzz = 0.3
+    };
+
+
+    Material m1 = MAT_CREATE_METAL_IP(&mm);
+    Material m2;
+    m2 = MAT_CREATE_METAL(&mm);
+    
+    ck_assert_ptr_eq(m2.mat, &mm);
+    ck_assert_int_eq(m2.matType, METAL);
+
+    ck_assert_ptr_eq(m1.mat, &mm);
+    ck_assert_int_eq(m1.matType, METAL);
+
+}
+END_TEST
+
+START_TEST(check_material_create_dielectric)
+{
+    DielectricMat dm = {
+        .ir = 0.3
+    };
+
+
+    Material m1 = MAT_CREATE_DIELECTRIC_IP(&dm);
+    Material m2;
+    m2 = MAT_CREATE_DIELECTRIC(&dm);
+    
+    ck_assert_ptr_eq(m2.mat, &dm);
+    ck_assert_int_eq(m2.matType, DIELECTRIC);
+
+    ck_assert_ptr_eq(m1.mat, &dm);
+    ck_assert_int_eq(m1.matType, DIELECTRIC);
+
+}
+END_TEST
+
+
 Suite* util_suite(void)
 {
     Suite *s;
@@ -607,6 +660,10 @@ Suite* util_suite(void)
     tcase_add_test(tc_core, check_material_metal_false);
     tcase_add_test(tc_core, check_material_dielectric_reflect);
     tcase_add_test(tc_core, check_material_dielectric_refract);
+    tcase_add_test(tc_core, check_material_create_lambertian);
+    tcase_add_test(tc_core, check_material_create_metal);
+    tcase_add_test(tc_core, check_material_create_dielectric);
+
 
     return s;
 }

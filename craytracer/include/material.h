@@ -29,13 +29,28 @@ typedef enum materialType {
 } MaterialType;
 
 typedef struct material {
-    const MetalMat * matMetal;
-    const LambertianMat * matLamb;
-    const DielectricMat * matDielectric;
+    const void * mat;
     MaterialType matType;
 } Material;
 
 
-bool mat_scatter (const Ray * restrict rayIn, const HitRecord * restrict rec, RGBColorF * restrict attenuation, Ray * restrict out);
+bool mat_scatter (
+        const Ray * restrict rayIn, 
+        const HitRecord * restrict rec, 
+        RGBColorF * restrict attenuation, 
+        Ray * restrict out
+    );
+
+
+// IP = in place
+#define MAT_CREATE_LAMB_IP(lambMatptr) { .mat = (lambMatptr), .matType = LAMBERTIAN}
+#define MAT_CREATE_METAL_IP(metalMatptr) { .mat = (metalMatptr), .matType = METAL}
+#define MAT_CREATE_DIELECTRIC_IP(dielecMatptr) { .mat = (dielecMatptr), .matType = DIELECTRIC}
+
+#define MAT_CREATE_LAMB(lambMatptr) (Material){ .mat = (lambMatptr), .matType = LAMBERTIAN}
+#define MAT_CREATE_METAL(metalMatptr) (Material){ .mat = (metalMatptr), .matType = METAL}
+#define MAT_CREATE_DIELECTRIC(dielecMatptr) (Material){ .mat = (dielecMatptr), .matType = DIELECTRIC}
+
+
 
 #endif
