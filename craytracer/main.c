@@ -270,10 +270,10 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 3.0 / 2.0;
-    const int WIDTH = 50;
+    const int WIDTH = 1200;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
-    const int SAMPLES_PER_PIXEL = 10;
-    const int MAX_DEPTH = 10;
+    const int SAMPLES_PER_PIXEL = 500;
+    const int MAX_DEPTH = 50;
 
 /*
     LambertianMat materialGround = {
@@ -345,12 +345,12 @@ int main(int argc, char *argv[]){
                         aspect_ratio);
    */
 
-    vec3 lookFrom = {.x = 3.0, .y = 3.0, .z = 2.0};
-    vec3 lookAt = {.x = 0.0, .y = 0.0, .z = -1.0};
+    vec3 lookFrom = {.x = 13.0, .y = 2.0, .z = 3.0};
+    vec3 lookAt = {.x = 0.0, .y = 0.0, .z = 0.0};
     vec3 up = {.x = 0.0, .y = 1.0, .z = 0.0};
 
-    CFLOAT distToFocus = 5.19615242271;
-    CFLOAT aperture = 2.0;
+    CFLOAT distToFocus = 10.0;
+    CFLOAT aperture = 0.1;
 
     Camera c;
     cam_setLookAtCamera(&c, lookFrom, lookAt, up, 20, aspect_ratio, aperture, distToFocus);
