@@ -258,41 +258,6 @@ void randomSpheres(int n, Sphere spheres[n], int * out, DynamicStackAlloc * dsa)
 #undef randomFloat
 
 int main(int argc, char *argv[]){
-    srand(1);
-
-    Camera cam = {0};
-
-    vec3 ip_lookfrom = {
-        .x = 3.0,
-        .y = 3.0, 
-        .z = 2.0
-    };
-
-    vec3 ip_lookat = {
-        .x = 0.0, 
-        .y = 0.0, 
-        .z = -1.0
-    };
-
-    vec3 ip_up = {
-        .x = 0.0, 
-        .y = 1.0, 
-        .z = 0.0
-    };
-
-    CFLOAT ip_vfov = 10.0;
-    CFLOAT ip_aspect_ratio = 16.0/9.0;
-    CFLOAT ip_aperture = 2.0;
-    CFLOAT ip_focusDist = 5.19615242271;
-        
-    cam_setLookAtCamera(&cam, ip_lookfrom, ip_lookat, ip_up, ip_vfov, ip_aspect_ratio, ip_aperture, ip_focusDist);
-
-    
-    //vector3_multiplyf(&randOnDist, cam.lensRadius);
-
-
-    // ------ testing --------
-
 
     if(argc < 2){
         printf("FATAL ERROR: Output file name not provided.\n");
@@ -310,6 +275,7 @@ int main(int argc, char *argv[]){
     const int SAMPLES_PER_PIXEL = 10;
     const int MAX_DEPTH = 10;
 
+/*
     LambertianMat materialGround = {
         .albedo = {.r = 0.8, .g = 0.8, .b = 0.0}
     };
@@ -360,7 +326,7 @@ int main(int argc, char *argv[]){
         .sphMat = {.matMetal = &materialRight, .matType = METAL },
         }
     };
-    
+*/  
 
     DynamicStackAlloc * dsa = alloc_createDynamicStackAllocD(1024, 100);
 
@@ -387,7 +353,7 @@ int main(int argc, char *argv[]){
     CFLOAT aperture = 2.0;
 
     Camera c;
-    cam_setLookAtCamera(&c, lookFrom, lookAt, up, 20, aspectRatio, aperture, distToFocus);
+    cam_setLookAtCamera(&c, lookFrom, lookAt, up, 20, aspect_ratio, aperture, distToFocus);
 
     Ray r;
     RGBColorF temp;
