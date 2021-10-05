@@ -1,7 +1,8 @@
 #include "sphere.h"
+#include <stdalign.h>
 #include <tgmath.h>
 
-void hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord){
+void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord){
     vec3 oc = r.origin;
     vec3 direction = r.direction;
 
@@ -72,5 +73,58 @@ void hit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord 
     vector3_multiplyf(&n, 1/s->radius);
     
     hr_setRecordi(t, p, n, direction, outRecord, &s->sphMat);
+}
+
+bool obj_objectLLAdd(
+        ObjectLL * restrict objll, 
+        DynamicStackAlloc * restrict dsa, 
+        void * restrict obj, 
+        ObjectType objType
+)
+{
+    if(!objll || !objll->valid){
+        return false;
+    }
+
+    ObjectLLNode * olln = alloc_dynamicStackAllocAllocate(dsa, 
+                          sizeof(ObjectLLNode), alignof(ObjectLLNode)); 
+    
+    olln->object = obj; 
+    olln->objType = objType;
+    if(!objll->head){
+        olln->next = NULL;
+    }else{
+        olln->next = objll->head->next;
+    }
+    objll->head = olln;
+    objll->numObjects += 1;
+
+    return true;
+}
+
+bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index){
+    if(!objll || !objll->valid){
+        return false;
+    }
+    
+    if(objll->numObjects <= index){
+        return false;
+    }
+    
+    if(index == 0){
+        objll->head = objll->head->next;
+        return true;  
+    }
+
+    size_t i = 0;
+    ObjectLLNode * cur = objll->head;
+    while(i < index){
+        cur = cur->next;
+        i++;
+    }
+    
+    cur->next = cur->next->next;
+
+    return true;
 }
 

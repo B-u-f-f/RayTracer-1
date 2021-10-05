@@ -38,7 +38,7 @@ START_TEST(check_sphere_1){
     Ray r = ray_create(origin, direction);
     
     HitRecord t_hr;
-    hit(&test_sphere, r, 0.001, F_MAX, &t_hr);
+    obj_sphereHit(&test_sphere, r, 0.001, F_MAX, &t_hr);
     ck_assert_int_eq(t_hr.valid, 0);
 }
 END_TEST
@@ -70,7 +70,7 @@ START_TEST(check_sphere_2){
     Ray r = ray_create(origin, direction);
 
     HitRecord t_hr;
-    hit(&t_sphere, r, 0.001, F_MAX, &t_hr);
+    obj_sphereHit(&t_sphere, r, 0.001, F_MAX, &t_hr);
 
     vec3 exp_point = {
         .x = -1.277684881485385,
@@ -118,7 +118,7 @@ START_TEST(check_sphere_3){
     Ray r = ray_create(origin, direction);
 
     HitRecord t_hr;
-    hit(&t_sphere, r, 100.0, F_MAX, &t_hr);
+    obj_sphereHit(&t_sphere, r, 100.0, F_MAX, &t_hr);
     ck_assert_int_eq(0 ,t_hr.valid);
    
 }
@@ -151,7 +151,7 @@ START_TEST(check_sphere_4){
     Ray r = ray_create(origin, direction);
 
     HitRecord t_hr;
-    hit(&t_sphere, r, 0.001, 4.0, &t_hr);
+    obj_sphereHit(&t_sphere, r, 0.001, 4.0, &t_hr);
     
     ck_assert_int_eq(0 ,t_hr.valid);
 }
@@ -184,7 +184,7 @@ START_TEST(check_sphere_5){
     Ray r = ray_create(origin, direction);
 
     HitRecord t_hr;
-    hit(&t_sphere, r, 0.001, F_MAX, &t_hr);
+    obj_sphereHit(&t_sphere, r, 0.001, F_MAX, &t_hr);
     
     vec3 exp_point = {
         .x = -3.0,
@@ -231,7 +231,7 @@ START_TEST(check_sphere_6){
     Ray r = ray_create(origin, direction);
 
     HitRecord t_hr;
-    hit(&t_sphere, r, 10000.0, F_MAX, &t_hr);
+    obj_sphereHit(&t_sphere, r, 10000.0, F_MAX, &t_hr);
 
     ck_assert_int_eq(0 ,t_hr.valid);
     
@@ -266,7 +266,7 @@ START_TEST(check_sphere_7){
     Ray r = ray_create(origin, direction);
 
     HitRecord t_hr;
-    hit(&t_sphere, r, 0.001, 1.0, &t_hr);
+    obj_sphereHit(&t_sphere, r, 0.001, 1.0, &t_hr);
 
     ck_assert_int_eq(t_hr.valid, 0);
 

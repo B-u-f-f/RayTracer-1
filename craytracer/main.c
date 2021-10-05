@@ -35,7 +35,7 @@ HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, LinearAllocFC * restri
     HitRecord * h = NULL;
 
     for(int i = 0; i < n; i++){
-        hit(sphere + i, ray, t_min, t_max, r);
+        obj_sphereHit(sphere + i, ray, t_min, t_max, r);
 
         if(r->valid){
 
