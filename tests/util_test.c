@@ -120,6 +120,22 @@ START_TEST(check_uint8_clamp_3){
 }
 END_TEST
 
+START_TEST(check_random_unit_disk){
+
+    vec3 th = util_randomUnitDisk();
+
+    ck_assert_ldouble_ge(th.x,-1.0);
+    ck_assert_ldouble_le(th.x,1.0);
+
+    ck_assert_ldouble_ge(th.y,-1.0);
+    ck_assert_ldouble_le(th.y,1.0);
+
+    CFLOAT temp = th.x*th.x + th.y*th.y;
+
+    ck_assert_ldouble_lt(temp,1);
+
+}END_TEST
+
 Suite* util_suite(void)
 {
     Suite *s;
@@ -142,6 +158,8 @@ Suite* util_suite(void)
     tcase_add_test(tc_core, check_uint8_clamp_1);
     tcase_add_test(tc_core, check_uint8_clamp_2);
     tcase_add_test(tc_core, check_uint8_clamp_3);
+    tcase_add_test(tc_core, check_random_unit_disk);
+    
 
     suite_add_tcase(s, tc_core);
 
