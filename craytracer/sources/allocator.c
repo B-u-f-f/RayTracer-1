@@ -489,7 +489,7 @@ bool alloc_dynamicStackAllocFreeAll(DynamicStackAlloc * restrict dsa){
  }
 
 void alloc_freeDynamicStackAlloc(DynamicStackAlloc * restrict dsa){
-    void * v;
+    void * v = NULL;
     while(dsa->ps.curOffset){
         alloc_ptrStackPop(&dsa->ps, &v); 
         alloc_freeStackAllocator((StackAlloc *)v);    

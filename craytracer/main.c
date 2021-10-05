@@ -269,10 +269,10 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 3.0 / 2.0;
-    const int WIDTH = 50;
+    const int WIDTH = 1200;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
-    const int SAMPLES_PER_PIXEL = 10;
-    const int MAX_DEPTH = 10;
+    const int SAMPLES_PER_PIXEL = 500;
+    const int MAX_DEPTH = 50;
 
 /*    
     LambertianMat materialGround = {
