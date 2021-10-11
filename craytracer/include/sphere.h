@@ -27,7 +27,7 @@ extern void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT 
 
 // enum contaning different types of objects
 typedef enum {
-    SPHERE
+    SPHERE,
 } ObjectType;
 
 // node of the linked list 
@@ -56,7 +56,9 @@ typedef struct objectLL {
 } ObjectLL; 
 
 
-   
+// create and setup an object linked list and return a pointer to it
+extern ObjectLL * obj_createObjectLL(DynamicStackAlloc * restrict dsa);
+
 // function to add an object to the linked list
 // returns true if the operation is successful
 extern bool obj_objectLLAdd(
@@ -66,13 +68,22 @@ extern bool obj_objectLLAdd(
         ObjectType objType
 );
 
-#define OBJ_OBJECTLLADD(objll, obj) _Generic((obj), \
-        (Sphere*): obj_objectLLAdd(objll, (void*) obj, SPHERE))
- 
+// function to add spheres
+// returns true if operation is successful
+extern bool obj_objLLAddSphere(ObjectLL * restrict objll, 
+        DynamicStackAlloc * restrict dsa,
+        Sphere s);
+
 // remove an object at any index
 extern bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index); 
 
-
+// returns a hit record if any object in the list is intersected by the given ray
+// under the given conditions
+extern HitRecord* obj_objLLHit (const ObjectLL* restrict objll, 
+                          Ray r, 
+                          CFLOAT t_min, 
+                          CFLOAT t_max, 
+                          LinearAllocFC * restrict hrAlloc);
 
 #endif
 

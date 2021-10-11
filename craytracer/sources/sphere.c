@@ -2,6 +2,19 @@
 #include <stdalign.h>
 #include <tgmath.h>
 
+
+static void hit(
+        const ObjectLLNode * restrict objLLn, 
+        Ray r, 
+        CFLOAT t_min, 
+        CFLOAT t_max, HitRecord * outRecord )
+{
+    if(objLLn->objType == SPHERE){
+        obj_sphereHit((const Sphere *)objLLn->object, r, t_min, t_max, outRecord);
+    }
+}
+
+
 void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord){
     vec3 oc = r.origin;
     vec3 direction = r.direction;
@@ -94,7 +107,7 @@ bool obj_objectLLAdd(
     if(!objll->head){
         olln->next = NULL;
     }else{
-        olln->next = objll->head->next;
+        olln->next = objll->head;
     }
     objll->head = olln;
     objll->numObjects += 1;
@@ -124,7 +137,65 @@ bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index){
     }
     
     cur->next = cur->next->next;
+    objll->numObjects -= 1;
 
     return true;
+}
+
+HitRecord * obj_objLLHit (const ObjectLL* restrict objll, 
+                   Ray r, 
+                   CFLOAT t_min, 
+                   CFLOAT t_max, 
+                   LinearAllocFC * restrict hrAlloc){
+    
+    if(!objll || !objll->valid){
+        return NULL;
+    }
+
+    HitRecord * hr = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
+    HitRecord * h = NULL;
+
+    ObjectLLNode * cur = objll->head; 
+    while(cur != NULL){
+        hit(cur, r, t_min, t_max, hr); 
+        
+        if(hr->valid){
+            if(h == NULL ){
+                h = hr;
+                hr = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
+            }else if(hr->distanceFromOrigin < h->distanceFromOrigin){
+                h = hr;
+                hr = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
+            }
+
+        }
+
+        cur = cur->next;
+    }
+
+
+    return h;
+}
+
+
+bool obj_objLLAddSphere(ObjectLL * restrict objll, 
+        DynamicStackAlloc * restrict dsa,
+        Sphere sphere)
+{
+    Sphere * s = alloc_dynamicStackAllocAllocate(dsa, sizeof(Sphere), alignof(Sphere));
+    *s = sphere; 
+    if(!s) { return false; }
+
+    return obj_objectLLAdd(objll, dsa, (void *) s, SPHERE);
+}
+
+ObjectLL * obj_createObjectLL(DynamicStackAlloc * restrict dsa){
+    ObjectLL * objLL = alloc_dynamicStackAllocAllocate(dsa, sizeof(ObjectLL), alignof(ObjectLL));
+
+    objLL->numObjects = 0;
+    objLL->head = NULL;
+    objLL->valid = true;
+
+    return objLL;
 }
 
