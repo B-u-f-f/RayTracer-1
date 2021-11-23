@@ -29,7 +29,7 @@ RGBColorU8 writeColor(CFLOAT r, CFLOAT g, CFLOAT b, int sample_per_pixel){
 
     return COLOR_U8CREATE(r, g, b);
 }
-
+/*
 HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, LinearAllocFC * restrict hrAlloc, CFLOAT t_min, CFLOAT t_max){
     HitRecord * r = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
     HitRecord * h = NULL;
@@ -51,21 +51,21 @@ HitRecord* hittableList(int n, Sphere sphere[n], Ray ray, LinearAllocFC * restri
     }    
     return h;
 }
+*/
 
-
-RGBColorF ray_c(Ray r, const ObjectLL * world, int depth, LinearAllocFC * restrict hrAlloc){
+RGBColorF ray_c(Ray r, const ObjectLL * world, int depth){
 
     if(depth <= 0){
         return (RGBColorF){0};
     }
 
-    HitRecord *  rec = obj_objLLHit(world, r, 0.00001, FLT_MAX, hrAlloc);
+    HitRecord *  rec = obj_objLLHit(world, r, 0.00001, FLT_MAX);
     if(rec != NULL){
         Ray scattered = {0};
         RGBColorF attenuation = {0};
         
         if(mat_scatter(&r, rec, &attenuation, &scattered)){
-            RGBColorF color = ray_c(scattered, world, depth - 1, hrAlloc);
+            RGBColorF color = ray_c(scattered, world, depth - 1);
             color = colorf_multiply(color, attenuation); 
 
             
@@ -121,7 +121,7 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
     materialGround->albedo.g = 0.5;
     materialGround->albedo.b = 0.5;
 
-    obj_objLLAddSphere(world, dsa, (Sphere){
+    obj_objLLAddSphere(world, (Sphere){
         .center = {.x = 0, .y = -1000, .z = 0}, .radius = 1000, .sphMat = MAT_CREATE_LAMB_IP(materialGround) 
     });
 
@@ -129,7 +129,7 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
         for (int b = -11; b < 11; b++){
             CFLOAT chooseMat = randomFloat();
             vec3 center = {
-                .x = a + 0.9 * randomFloat(), 
+                .x = a + 0.9 * randomFloat(),
                 .y = 0.2, 
                 .z = b + 0.9 * randomFloat()
             };
@@ -152,7 +152,7 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
                                             alignof(LambertianMat));
 
                     lambMat->albedo = albedo;
-                    obj_objLLAddSphere(world, dsa, (Sphere) {
+                    obj_objLLAddSphere(world, (Sphere) {
                         .center = center,
                         .radius = 0.2,
                         .sphMat = MAT_CREATE_LAMB_IP(lambMat) 
@@ -174,7 +174,7 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
                     metalMat->albedo = albedo;
                     metalMat->fuzz = fuzz;
 
-                    obj_objLLAddSphere(world, dsa, (Sphere) {
+                    obj_objLLAddSphere(world, (Sphere) {
                         .center = center,
                         .radius = 0.2,
                         .sphMat = MAT_CREATE_METAL_IP(metalMat) 
@@ -186,7 +186,7 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
                                            sizeof(DielectricMat), 
                                            alignof(DielectricMat));
                     dMat->ir = 1.5;
-                    obj_objLLAddSphere(world, dsa, (Sphere) {
+                    obj_objLLAddSphere(world, (Sphere) {
                         .center = center,
                         .radius = 0.2,
                         .sphMat = MAT_CREATE_DIELECTRIC_IP(dMat)
@@ -203,7 +203,7 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
                                            alignof(DielectricMat));    
     material1->ir = 1.5;
 
-    obj_objLLAddSphere(world, dsa, (Sphere){
+    obj_objLLAddSphere(world, (Sphere){
         .center = {.x = 0, .y = 1, .z = 0},
         .radius = 1.0,
         .sphMat = MAT_CREATE_DIELECTRIC_IP(material1) 
@@ -217,7 +217,7 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
     material2->albedo.g = 0.2;
     material2->albedo.b = 0.1;
 
-    obj_objLLAddSphere(world, dsa, (Sphere){
+    obj_objLLAddSphere(world, (Sphere){
         .center = {.x = -4, .y = 1, .z = 0},
         .radius = 1.0,
         .sphMat = MAT_CREATE_LAMB_IP(material2) 
@@ -232,7 +232,7 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
     material3->albedo.b = 0.5;
     material3->fuzz = 0.0;
 
-    obj_objLLAddSphere(world, dsa, (Sphere){
+    obj_objLLAddSphere(world, (Sphere){
         .center = {.x = 4, .y = 1, .z = 0},
         .radius = 1.0,
         .sphMat = MAT_CREATE_METAL_IP(material3) 
@@ -255,77 +255,10 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 3.0 / 2.0;
-    const int WIDTH = 1200;
+    const int WIDTH = 256;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
-    const int SAMPLES_PER_PIXEL = 500;
+    const int SAMPLES_PER_PIXEL = 20;
     const int MAX_DEPTH = 50;
-
-    DynamicStackAlloc * dsa = alloc_createDynamicStackAllocD(1024, 100);
-    DynamicStackAlloc * dsaO = alloc_createDynamicStackAllocD(1024, 10);
-    
-    ObjectLL * world = obj_createObjectLL(dsaO);
-
-/*     LambertianMat materialGround = {
-        .albedo = {.r = 0.8, .g = 0.8, .b = 0.0}
-    };
-
-    LambertianMat materialCenter = {
-        .albedo = {.r = 0.1, .g = 0.2, .b = 0.5}
-    }; 
-
-    DielectricMat materialLeft = {
-        .ir = 1.5
-    };
-
-    MetalMat materialRight = {
-        .albedo = {.r = 0.8, .g = 0.6,.b = 0.2},
-        .fuzz = 0.0
-    }; 
-
-
-    Sphere s[5] = {
-        {
-        .center = { .x = 0.0, .y = -100.5, .z = -1.0},
-        .radius = 100.0,
-        .sphMat = MAT_CREATE_LAMB_IP(&materialGround),
-        }, 
-         
-        {
-        .center = { .x = 0.0, .y = 0.0, .z = -1.0},
-        .radius = 0.5,
-        .sphMat = MAT_CREATE_LAMB_IP(&materialCenter),
-        }, 
-        
-        {
-        .center = {.x = -1.0, .y = 0.0, .z = -1.0},
-        .radius = 0.5,
-        .sphMat = MAT_CREATE_DIELECTRIC_IP(&materialLeft),
-        },
-
-        {
-        .center = {.x = -1.0, .y = 0.0, .z = -1.0},
-        .radius = -0.45,
-        .sphMat = MAT_CREATE_DIELECTRIC_IP(&materialLeft),
-        },
-
-        {
-        .center = {.x = 1.0, .y = 0.0, .z = -1.0},
-        .radius = 0.5,
-        .sphMat = MAT_CREATE_DIELECTRIC_IP(&materialRight),
-        }
-    };
-    
-    obj_objLLAddSphere(world, dsa, s[0]); 
-    obj_objLLAddSphere(world, dsa, s[1]); 
-    obj_objLLAddSphere(world, dsa, s[2]); 
-    obj_objLLAddSphere(world, dsa, s[3]); 
-    obj_objLLAddSphere(world, dsa, s[4]); 
-*/
-
-    //Sphere *s = malloc(500 * sizeof(Sphere));
-    //int numSpheres = 0;
-
-    randomSpheres(world, dsa);
 
     vec3 lookFrom = {.x = 13.0, .y = 2.0, .z = 3.0};
     vec3 lookAt = {.x = 0.0, .y = 0.0, .z = 0.0};
@@ -341,8 +274,15 @@ int main(int argc, char *argv[]){
     RGBColorF temp;
     
     RGBColorU8* image = (RGBColorU8*) malloc(sizeof(RGBColorF) * HEIGHT * WIDTH);
-//    PoolAlloc * hrpa = alloc_createPoolAllocator(sizeof(HitRecord) * MAX_DEPTH * SAMPLES_PER_PIXEL * 2, alignof(HitRecord), sizeof(HitRecord)); 
+
+    DynamicStackAlloc * dsa = alloc_createDynamicStackAllocD(1024, 100);
+    DynamicStackAlloc * dsaO = alloc_createDynamicStackAllocD(1024, 10);
+    
+    ObjectLL * world = obj_createObjectLL(dsaO, dsa);
+
+    randomSpheres(world, dsa);
     LinearAllocFC * lafc = alloc_createLinearAllocFC(MAX_DEPTH * world->numObjects, sizeof(HitRecord), alignof(HitRecord));
+    world->hrAlloc = lafc;
 
     CFLOAT pcR, pcG, pcB;
 
@@ -356,7 +296,7 @@ int main(int argc, char *argv[]){
                 CFLOAT v = ((CFLOAT)j + util_randomFloat(0.0, 1.0)) / (HEIGHT - 1);
                 r = cam_getRay(&c, u, v);
               
-                temp = ray_c(r, world, MAX_DEPTH, lafc);
+                temp = ray_c(r, world, MAX_DEPTH);
 
                 pcR += temp.r;
                 pcG += temp.g;
@@ -366,7 +306,6 @@ int main(int argc, char *argv[]){
             }
 
             image[i + WIDTH * (HEIGHT - 1 - j)] = writeColor(pcR, pcG, pcB, SAMPLES_PER_PIXEL);
-//            alloc_poolAllocFreeAll(hrpa);
         }
 
         printProgressBar(HEIGHT - 1 - j, HEIGHT - 1);
@@ -374,9 +313,7 @@ int main(int argc, char *argv[]){
 
     writeToPPM(argv[1], WIDTH, HEIGHT, image);
     free(image);
-    //free(s);
     
-//    alloc_freePoolAllocator(hrpa);
     alloc_freeLinearAllocFC(lafc);
     alloc_freeDynamicStackAllocD(dsa);
     alloc_freeDynamicStackAllocD(dsaO);

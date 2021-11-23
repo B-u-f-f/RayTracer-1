@@ -11,7 +11,9 @@ static void hit(
 {
     if(objLLn->objType == SPHERE){
         obj_sphereHit((const Sphere *)objLLn->object, r, t_min, t_max, outRecord);
-    }
+    }/*else if(objLLn->objType == OBJLL){
+        obj_
+    }*/
 }
 
 
@@ -90,7 +92,6 @@ void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, 
 
 bool obj_objectLLAdd(
         ObjectLL * restrict objll, 
-        DynamicStackAlloc * restrict dsa, 
         void * restrict obj, 
         ObjectType objType
 )
@@ -99,16 +100,18 @@ bool obj_objectLLAdd(
         return false;
     }
 
-    ObjectLLNode * olln = alloc_dynamicStackAllocAllocate(dsa, 
+    ObjectLLNode * olln = alloc_dynamicStackAllocAllocate(objll->dsa, 
                           sizeof(ObjectLLNode), alignof(ObjectLLNode)); 
     
-    olln->object = obj; 
+    olln->object = obj;
     olln->objType = objType;
+
     if(!objll->head){
         olln->next = NULL;
     }else{
         olln->next = objll->head;
     }
+
     objll->head = olln;
     objll->numObjects += 1;
 
@@ -142,30 +145,29 @@ bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index){
     return true;
 }
 
-HitRecord * obj_objLLHit (const ObjectLL* restrict objll, 
+HitRecord * obj_objLLHit (const ObjectLL* restrict objll,
                    Ray r, 
-                   CFLOAT t_min, 
-                   CFLOAT t_max, 
-                   LinearAllocFC * restrict hrAlloc){
+                   CFLOAT t_min,
+                   CFLOAT t_max){
     
     if(!objll || !objll->valid){
         return NULL;
     }
 
-    HitRecord * hr = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
+    HitRecord * hr = (HitRecord *) alloc_linearAllocFCAllocate(objll->hrAlloc);
     HitRecord * h = NULL;
 
-    ObjectLLNode * cur = objll->head; 
+    ObjectLLNode * cur = objll->head;
     while(cur != NULL){
-        hit(cur, r, t_min, t_max, hr); 
+        hit(cur, r, t_min, t_max, hr);
         
         if(hr->valid){
             if(h == NULL ){
                 h = hr;
-                hr = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
+                hr = (HitRecord *) alloc_linearAllocFCAllocate(objll->hrAlloc);
             }else if(hr->distanceFromOrigin < h->distanceFromOrigin){
                 h = hr;
-                hr = (HitRecord *) alloc_linearAllocFCAllocate(hrAlloc);
+                hr = (HitRecord *) alloc_linearAllocFCAllocate(objll->hrAlloc);
             }
 
         }
@@ -178,24 +180,116 @@ HitRecord * obj_objLLHit (const ObjectLL* restrict objll,
 }
 
 
-bool obj_objLLAddSphere(ObjectLL * restrict objll, 
-        DynamicStackAlloc * restrict dsa,
+bool obj_objLLAddSphere(ObjectLL * restrict objll,
         Sphere sphere)
 {
-    Sphere * s = alloc_dynamicStackAllocAllocate(dsa, sizeof(Sphere), alignof(Sphere));
+    Sphere * s = alloc_dynamicStackAllocAllocate(objll->dsa, sizeof(Sphere), alignof(Sphere));
     *s = sphere; 
     if(!s) { return false; }
 
-    return obj_objectLLAdd(objll, dsa, (void *) s, SPHERE);
+    return obj_objectLLAdd(objll, (void *) s, SPHERE);
 }
 
-ObjectLL * obj_createObjectLL(DynamicStackAlloc * restrict dsa){
-    ObjectLL * objLL = alloc_dynamicStackAllocAllocate(dsa, sizeof(ObjectLL), alignof(ObjectLL));
+ObjectLL * obj_createObjectLL(    
+    DynamicStackAlloc * restrict dsaAlloc, 
+    DynamicStackAlloc * restrict dsaObjs
+){
+    
+    ObjectLL * objLL = alloc_dynamicStackAllocAllocate(dsaAlloc, sizeof(ObjectLL), alignof(ObjectLL));
 
     objLL->numObjects = 0;
     objLL->head = NULL;
     objLL->valid = true;
+    objLL->dsa = dsaObjs;
+    objLL->hrAlloc = NULL; 
 
     return objLL;
+}
+
+bool obj_AABBHit(const AABB* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max){
+    for(int i = 0; i < 3; i++){
+        CFLOAT t0 = CF_MIN(
+            (s->minimum.v[i] - r.origin.v[i])/(r.direction.v[i]),
+            (s->maximum.v[i] - r.origin.v[i])/(r.direction.v[i])
+        );
+
+        CFLOAT t1 = CF_MAX(
+            (s->minimum.v[i] - r.origin.v[i]) / r.direction.v[i],
+            (s->maximum.v[i] - r.origin.v[i]) / r.direction.v[i]
+        );
+
+        t_min = CF_MAX(t0, t_min);
+        t_max = CF_MIN(t1, t_max);
+
+        if(t_max<=t_min){
+            return false;
+        }
+    }
+    return true;
+}
+
+bool obj_sphereCalcBoundingBox(const Sphere* restrict s, AABB * outbox){
+    outbox->minimum.x = s->center.x - s->radius;
+    outbox->minimum.y = s->center.y - s->radius;
+    outbox->minimum.z = s->center.z - s->radius;
+
+    outbox->maximum.x = s->center.x + s->radius;
+    outbox->maximum.y = s->center.y + s->radius;
+    outbox->maximum.z = s->center.z + s->radius;
+    
+    return true;
+}
+
+static AABB surrounding_box(const AABB* restrict box0, const AABB* restrict box1){
+    vec3 small;
+    vec3 big;
+    AABB temp_AABB;
+
+    small.x = CF_MIN(box0->minimum.x, box1->minimum.x);
+    small.y = CF_MIN(box0->minimum.y, box1->minimum.y);
+    small.z = CF_MIN(box0->minimum.z, box1->minimum.z);
+    
+    big.x = CF_MAX(box0->maximum.x, box1->maximum.x);
+    big.y = CF_MAX(box0->maximum.y, box1->maximum.y);
+    big.z = CF_MAX(box0->maximum.z, box1->maximum.z);
+
+    temp_AABB.minimum = small;
+    temp_AABB.maximum = big;
+    return temp_AABB;
+    
+}
+
+static bool boundingBox(const ObjectLLNode * restrict objLLn, AABB* outbox){
+    if(objLLn->objType == SPHERE){
+        return obj_sphereCalcBoundingBox(((const Sphere *)objLLn->object), outbox);
+    }
+    
+    return false;
+}
+
+bool obj_objectLLCalcBoundingBox(const ObjectLL* restrict objll, AABB * outbox){
+    if(objll->numObjects == 0) return false;
+    
+    AABB tempBox;
+    bool firstBox = true;
+
+    ObjectLLNode* cur = objll->head;
+
+    while(cur != NULL){
+        
+        if(!boundingBox(cur, &tempBox)) return false;
+
+        
+        if(firstBox){
+            *outbox = tempBox;
+        }else{
+            *outbox = surrounding_box(outbox, &tempBox);
+        }
+        
+        firstBox = false;
+        cur = cur->next;
+    }    
+
+    return true;
 }
 

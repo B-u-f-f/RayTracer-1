@@ -6,6 +6,7 @@
 #include <types.h>
 #include <assert.h>
 #include <stdbool.h>
+#include "sphere.h"
 
 
 #define ck_float_equal(a, b) ck_assert_int_eq(float_equal((a), (b)), 1)
@@ -28,6 +29,10 @@
     ck_assert_int_eq(ck_assert_u8_eq((v1).r, (v2).r), 1); \
     ck_assert_int_eq(ck_assert_u8_eq((v1).g, (v2).g), 1); \
     ck_assert_int_eq(ck_assert_u8_eq((v1).b, (v2).b), 1); \
+} \
+
+#define ck_assert_objectLLNode_eq(n1, n2) { \
+    ck_assert_int_eq(n1 == n2, 1); \
 } \
 
 extern bool nearly_equal(CFLOAT a, CFLOAT b, CFLOAT epsilon, CFLOAT abs_th){

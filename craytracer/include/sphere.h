@@ -22,12 +22,20 @@ typedef struct {
     CFLOAT radius;
 } Sphere;
 
-extern void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord);
+typedef struct {
+    vec3 maximum;
+    vec3 minimum;
+} AABB;
 
+
+extern void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord);
+extern bool obj_sphereCalcBoundingBox(const Sphere* restrict s, AABB * outbox);
 
 // enum contaning different types of objects
 typedef enum {
     SPHERE,
+    OBJLL,
+    BVHNODE
 } ObjectType;
 
 // node of the linked list 
@@ -37,7 +45,7 @@ typedef struct objectLLNode{
     void * restrict object;
 
     // type of the object 
-    ObjectType objType; 
+    ObjectType objType;
     
     // points to the next node
     ObjectLLNode * restrict next;
@@ -50,28 +58,35 @@ typedef struct objectLL {
     
     // points to the first node in the linked list 
     ObjectLLNode * restrict head;
-     
+    
+    // Dynamic allocation stack
+    DynamicStackAlloc * restrict dsa;
+
+    // Linear allocator
+    LinearAllocFC * restrict hrAlloc;
+
     // whether the object is valid or not
     bool valid;
-} ObjectLL; 
+} ObjectLL;
 
 
 // create and setup an object linked list and return a pointer to it
-extern ObjectLL * obj_createObjectLL(DynamicStackAlloc * restrict dsa);
+extern ObjectLL * obj_createObjectLL(
+    DynamicStackAlloc * restrict dsaAlloc, 
+    DynamicStackAlloc * restrict dsaObjs
+);
 
 // function to add an object to the linked list
 // returns true if the operation is successful
 extern bool obj_objectLLAdd(
         ObjectLL * restrict objll, 
-        DynamicStackAlloc * restrict dsa, 
         void * restrict obj, 
         ObjectType objType
 );
 
 // function to add spheres
 // returns true if operation is successful
-extern bool obj_objLLAddSphere(ObjectLL * restrict objll, 
-        DynamicStackAlloc * restrict dsa,
+extern bool obj_objLLAddSphere(ObjectLL * restrict objll,
         Sphere s);
 
 // remove an object at any index
@@ -82,8 +97,27 @@ extern bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index);
 extern HitRecord* obj_objLLHit (const ObjectLL* restrict objll, 
                           Ray r, 
                           CFLOAT t_min, 
-                          CFLOAT t_max, 
-                          LinearAllocFC * restrict hrAlloc);
+                          CFLOAT t_max);
 
+
+
+
+
+
+extern bool obj_objectLLCalcBoundingBox(const ObjectLL* restrict objll, AABB * outbox);
+extern bool obj_AABBHit(const AABB* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max);
+
+/*
+typedef struct {
+
+} BVH;
+
+typedef struct {
+
+    
+    AABB box;
+
+} BVHNode;
+*/
 #endif
 

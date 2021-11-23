@@ -8,8 +8,8 @@
 #include "sphere.h"
 #include "testutils.h"
 #include "ray.h"
-
-
+#include "allocator.h"
+#include "material.h"
 
 //discriminant < 0 so no intersection
 START_TEST(check_sphere_1){
@@ -273,7 +273,52 @@ START_TEST(check_sphere_7){
     
 }
 END_TEST
+/*
+START_TEST(check_createObjectLL){
 
+    DynamicStackAlloc * d = alloc_createDynamicStackAllocD(1024, 10);
+
+    ObjectLL * o = obj_createObjectLL(d);
+
+    int expected_numObjects = 0;
+    ObjectLLNode * expected_head = NULL;
+    int expected_valid = 1;
+
+    ck_assert_int_eq(expected_numObjects, o->numObjects);
+    ck_assert_objectLLNode_eq(expected_head, o->head);
+    ck_assert_int_eq(expected_valid, o->valid);
+
+    alloc_freeDynamicStackAllocD(d);
+
+}END_TEST
+*/
+/*
+START_TEST(check_objectLLAdd){
+
+    DynamicStackAlloc * da0 = alloc_createDynamicStackAlloc(1024, 10);
+    DynamicStackAlloc * da1 = alloc_createDynamicStackAlloc(1024, 100);
+
+    ObjectLL * o = alloc_dynamicStackAllocAllocate(da0, sizeof(ObjectLL), alignof(ObjectLL));
+    o->numObjects = 0;
+    o->head = NULL;
+    o->valid = true;
+
+    Sphere s = {
+        .center = {
+            .x = 0,
+            .y = 1,
+            .z = 0
+        },
+
+        .radius = 1.0,
+
+
+    };
+
+    alloc_freeDynamicStackAllocD(d0);
+    alloc_freeDynamicStackAllocD(d1);
+}
+*/
 
 Suite* sphere_suite(void){
     Suite *s;
@@ -291,6 +336,7 @@ Suite* sphere_suite(void){
     tcase_add_test(tc_core, check_sphere_5);
     tcase_add_test(tc_core, check_sphere_6);
     tcase_add_test(tc_core, check_sphere_7);
+    //tcase_add_test(tc_core, check_createObjectLL);
     suite_add_tcase(s, tc_core);
 
     return s;
