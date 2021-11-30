@@ -11,9 +11,9 @@ static void hit(
 {
     if(objLLn->objType == SPHERE){
         obj_sphereHit((const Sphere *)objLLn->object, r, t_min, t_max, outRecord);
-    }/*else if(objLLn->objType == OBJLL){
-        obj_
-    }*/
+    }else if(objLLn->objType == OBJLL){
+        obj_objLLHit((const ObjectLL *)objLLn->object, r, t_min, t_max, outRecord);
+    }
 }
 
 
@@ -145,13 +145,14 @@ bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index){
     return true;
 }
 
-HitRecord * obj_objLLHit (const ObjectLL* restrict objll,
+/*HitRecord**/void obj_objLLHit (const ObjectLL* restrict objll,
                    Ray r, 
                    CFLOAT t_min,
-                   CFLOAT t_max){
+                   CFLOAT t_max,
+                   HitRecord * out){
     
     if(!objll || !objll->valid){
-        return NULL;
+        return; //NULL;
     }
 
     HitRecord * hr = (HitRecord *) alloc_linearAllocFCAllocate(objll->hrAlloc);
@@ -174,9 +175,10 @@ HitRecord * obj_objLLHit (const ObjectLL* restrict objll,
 
         cur = cur->next;
     }
-
-
-    return h;
+    
+    if(h != NULL)
+        *out = *h;  
+    //return h;
 }
 
 
@@ -259,9 +261,12 @@ static AABB surrounding_box(const AABB* restrict box0, const AABB* restrict box1
     
 }
 
+
 static bool boundingBox(const ObjectLLNode * restrict objLLn, AABB* outbox){
     if(objLLn->objType == SPHERE){
         return obj_sphereCalcBoundingBox(((const Sphere *)objLLn->object), outbox);
+    }else if(objLLn->objType == OBJLL){
+        return obj_objectLLCalcBoundingBox((const ObjectLL *)objLLn->object, outbox);
     }
     
     return false;

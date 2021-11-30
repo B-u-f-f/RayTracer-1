@@ -94,17 +94,17 @@ extern bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index);
 
 // returns a hit record if any object in the list is intersected by the given ray
 // under the given conditions
-extern HitRecord* obj_objLLHit (const ObjectLL* restrict objll, 
+extern /*HitRecord**/void obj_objLLHit (const ObjectLL* restrict objll, 
                           Ray r, 
                           CFLOAT t_min, 
-                          CFLOAT t_max);
+                          CFLOAT t_max,
+                          HitRecord * out);
+
+extern bool obj_objectLLCalcBoundingBox(const ObjectLL * restrict objll, AABB* restrict outbox);
 
 
 
 
-
-
-extern bool obj_objectLLCalcBoundingBox(const ObjectLL* restrict objll, AABB * outbox);
 extern bool obj_AABBHit(const AABB* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max);
 
 /*

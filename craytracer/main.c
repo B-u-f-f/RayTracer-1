@@ -58,13 +58,15 @@ RGBColorF ray_c(Ray r, const ObjectLL * world, int depth){
     if(depth <= 0){
         return (RGBColorF){0};
     }
-
-    HitRecord *  rec = obj_objLLHit(world, r, 0.00001, FLT_MAX);
-    if(rec != NULL){
+    
+    HitRecord rec;
+    rec.valid = false;
+    /*HitRecord *  rec =*/ obj_objLLHit(world, r, 0.00001, FLT_MAX, &rec);
+    if(rec.valid){
         Ray scattered = {0};
         RGBColorF attenuation = {0};
         
-        if(mat_scatter(&r, rec, &attenuation, &scattered)){
+        if(mat_scatter(&r, &rec, &attenuation, &scattered)){
             RGBColorF color = ray_c(scattered, world, depth - 1);
             color = colorf_multiply(color, attenuation); 
 
@@ -255,9 +257,9 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 3.0 / 2.0;
-    const int WIDTH = 256;
+    const int WIDTH = 512;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
-    const int SAMPLES_PER_PIXEL = 20;
+    const int SAMPLES_PER_PIXEL = 100;
     const int MAX_DEPTH = 50;
 
     vec3 lookFrom = {.x = 13.0, .y = 2.0, .z = 3.0};
