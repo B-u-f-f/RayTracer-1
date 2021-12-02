@@ -70,7 +70,7 @@ RGBColorF ray_c(Ray r, const ObjectLL * world, int depth){
         
         if(mat_scatter(&r, &rec, &attenuation, &scattered)){
             RGBColorF color = ray_c(scattered, world, depth - 1);
-            color = colorf_multiply(color, attenuation); 
+            color = colorf_multiply(color, attenuation);
 
             
             return color;
@@ -296,9 +296,9 @@ int main(int argc, char *argv[]){
     printf("Using Hypatia Version:%s\n", HYPATIA_VERSION);
 
     const CFLOAT aspect_ratio = 3.0 / 2.0;
-    const int WIDTH = 512;
+    const int WIDTH = 256;
     const int HEIGHT = (int)(WIDTH/aspect_ratio);
-    const int SAMPLES_PER_PIXEL = 100;
+    const int SAMPLES_PER_PIXEL = 20;
     const int MAX_DEPTH = 50;
 
     vec3 lookFrom = {.x = 13.0, .y = 2.0, .z = 3.0};
@@ -324,7 +324,7 @@ int main(int argc, char *argv[]){
 
     // randomSpheres(world, dsa);
     
-    const char * file = "/home/lenovo/VTOP/pdc/project/pdc_project/testtextures/img2.png";
+    const char * file = "/home/kaustubh0201/Desktop/Fall Semester '22/Parallel and Distributed Computing/Project/RayTracer/RayTracer/images/world_map.png";
 
     Image img = {0};
     tex_loadImage(&img, file);

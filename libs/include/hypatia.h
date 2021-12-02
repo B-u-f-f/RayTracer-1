@@ -5,6 +5,8 @@
 
 #define HYPATIA_VERSION "2.0.0"
 
+#include <omp.h>
+
 #ifndef HYPAPI
 #	ifdef HYP_STATIC
 #		define HYPAPI static
@@ -1036,9 +1038,14 @@ HYPAPI struct vector3 *vector3_setf3(struct vector3 *self, HYP_FLOAT xT, HYP_FLO
  */
 HYPAPI struct vector3 *vector3_set(struct vector3 *self, const struct vector3 *vT)
 {
-	self->x = vT->x;
-	self->y = vT->y;
-	self->z = vT->z;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+            (self->v[i])=(vT->v[i]);
+    }
+
+	//self->x = vT->x;
+	//self->y = vT->y;
+	//self->z = vT->z;
 	return self;
 }
 
@@ -1071,10 +1078,16 @@ HYPAPI int vector3_equals(const struct vector3 *self, const struct vector3 *vT)
  */
 HYPAPI struct vector3 *vector3_negate(struct vector3 *self)
 {
-	self->v[0] = -self->v[0];
-	self->v[1] = -self->v[1];
-	self->v[2] = -self->v[2];
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+            (self->v[i])=-(self->v[i]);
+    }
 	return self;
+	
+	//self->v[0] = -self->v[0];
+	//self->v[1] = -self->v[1];
+	//self->v[2] = -self->v[2];
+	//return self;
 }
 
 
@@ -1084,10 +1097,16 @@ HYPAPI struct vector3 *vector3_negate(struct vector3 *self)
  */
 HYPAPI struct vector3 *vector3_add(struct vector3 *self, const struct vector3 *vT)
 {
-	self->v[0] += vT->v[0];
-	self->v[1] += vT->v[1];
-	self->v[2] += vT->v[2];
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+            (self->v[i])+=(vT->v[i]);
+    }
 	return self;
+	
+	// self->v[0] += vT->v[0];
+	// self->v[1] += vT->v[1];
+	// self->v[2] += vT->v[2];
+	// return self;
 }
 
 
@@ -1097,10 +1116,16 @@ HYPAPI struct vector3 *vector3_add(struct vector3 *self, const struct vector3 *v
  */
 HYPAPI struct vector3 *vector3_addf(struct vector3 *self, HYP_FLOAT f)
 {
-	self->v[0] += f;
-	self->v[1] += f;
-	self->v[2] += f;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		(self->v[i])+=f;
+	}
 	return self;
+
+	//self->v[0] += fT;
+	//self->v[1] += fT;
+	//self->v[2] += fT;
+	//return self;
 }
 
 
@@ -1110,10 +1135,16 @@ HYPAPI struct vector3 *vector3_addf(struct vector3 *self, HYP_FLOAT f)
  */
 HYPAPI struct vector3 *vector3_subtract(struct vector3 *self, const struct vector3 *vT)
 {
-	self->v[0] -= vT->v[0];
-	self->v[1] -= vT->v[1];
-	self->v[2] -= vT->v[2];
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		(self->v[i]) -= (vT->v[i]);
+	}
 	return self;
+
+	//self->v[0] -= vT->v[0];
+	//self->v[1] -= vT->v[1];
+	//self->v[2] -= vT->v[2];
+	//return self;
 }
 
 
@@ -1123,10 +1154,16 @@ HYPAPI struct vector3 *vector3_subtract(struct vector3 *self, const struct vecto
  */
 HYPAPI struct vector3 *vector3_subtractf(struct vector3 *self, HYP_FLOAT f)
 {
-	self->v[0] -= f;
-	self->v[1] -= f;
-	self->v[2] -= f;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		(self->v[i]) -= f;
+	}
 	return self;
+
+	//self->v[0] -= f;
+	//self->v[1] -= f;
+	//self->v[2] -= f;
+	//return self;
 }
 
 
@@ -1136,10 +1173,16 @@ HYPAPI struct vector3 *vector3_subtractf(struct vector3 *self, HYP_FLOAT f)
  */
 HYPAPI struct vector3 *vector3_multiply(struct vector3 *self, const struct vector3 *vT)
 {
-	self->v[0] *= vT->v[0];
-	self->v[1] *= vT->v[1];
-	self->v[2] *= vT->v[2];
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		(self->v[i])*=(vT->v[i]);
+	}
 	return self;
+
+	//self->v[0] *= vT->v[0];
+	//self->v[1] *= vT->v[1];
+	//self->v[2] *= vT->v[2];
+	//return self;
 }
 
 
@@ -1149,10 +1192,16 @@ HYPAPI struct vector3 *vector3_multiply(struct vector3 *self, const struct vecto
  */
 HYPAPI struct vector3 *vector3_multiplyf(struct vector3 *self, HYP_FLOAT f)
 {
-	self->v[0] *= f;
-	self->v[1] *= f;
-	self->v[2] *= f;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		(self->v[i])*=f;
+	}
 	return self;
+
+	//self->v[0] *= f;
+	//self->v[1] *= f;
+	//self->v[2] *= f;
+	//return self;
 }
 
 
@@ -1163,10 +1212,16 @@ HYPAPI struct vector3 *vector3_multiplyf(struct vector3 *self, HYP_FLOAT f)
  */
 HYPAPI struct vector3 *vector3_divide(struct vector3 *self, const struct vector3 *vT)
 {
-	self->v[0] /= vT->v[0];
-	self->v[1] /= vT->v[1];
-	self->v[2] /= vT->v[2];
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		(self->v[i])/=(vT->v[i]);
+	}
 	return self;
+	
+	//self->v[0] /= vT->v[0];
+	//self->v[1] /= vT->v[1];
+	//self->v[2] /= vT->v[2];
+	//return self;
 }
 
 
@@ -1176,7 +1231,14 @@ HYPAPI struct vector3 *vector3_divide(struct vector3 *self, const struct vector3
  */
 HYPAPI HYP_FLOAT vector3_magnitude(const struct vector3 *self)
 {
-	return HYP_SQRT((self->x * self->x) + (self->y * self->y) + (self->z * self->z));
+    double sum=0.0;
+	#pragma omp simd reduction(+:sum)
+	for (int i=0 ; i<3 ; ++i){
+            sum+=((self->v[i])*(self->v[i]));
+    }
+
+	return HYP_SQRT(sum);
+	//return HYP_SQRT((self->x * self->x) + (self->y * self->y) + (self->z * self->z));
 }
 
 
@@ -1197,11 +1259,16 @@ HYPAPI struct vector3 *vector3_normalize(struct vector3 *self)
 		return self;
 	}
 
-	self->x = self->x / mag;
-	self->y = self->y / mag;
-	self->z = self->z / mag;
-
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		(self->v[i])/=mag;
+	}
 	return self;
+
+	//self->x = self->x / mag;
+	//self->y = self->y / mag;
+	//self->z = self->z / mag;
+	//return self;
 }
 
 
@@ -1211,7 +1278,14 @@ HYPAPI struct vector3 *vector3_normalize(struct vector3 *self)
  */
 HYPAPI HYP_FLOAT vector3_dot_product(const struct vector3 *self, const struct vector3 *vT)
 {
-	return (self->x * vT->x) + (self->y * vT->y) + (self->z * vT->z);
+	double sum=0.0;
+	#pragma omp simd reduction(+:sum)
+	for (int i=0 ; i<3 ; ++i){
+            sum+=((self->v[i])*(vT->v[i]));
+    }
+
+    return sum;
+	//return (self->x * vT->x) + (self->y * vT->y) + (self->z * vT->z);
 }
 
 
@@ -1221,10 +1295,17 @@ HYPAPI HYP_FLOAT vector3_dot_product(const struct vector3 *self, const struct ve
  */
 HYPAPI struct vector3 *vector3_cross_product(struct vector3 *vR, const struct vector3 *vT1, const struct vector3 *vT2)
 {
-	vR->x = (vT1->y * vT2->z) - (vT1->z * vT2->y);
-	vR->y = (vT1->z * vT2->x) - (vT1->x * vT2->z);
-	vR->z = (vT1->x * vT2->y) - (vT1->y * vT2->x);
+	
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		vR->v[i]=((vT1->v[(i+1)%3] * vT2->v[(i+2)%3]) - (vT1->v[(i+2)%3] * vT2->v[(i+1)%3]));
+	}
 	return vR;
+
+	// vR->x = (vT1->y * vT2->z) - (vT1->z * vT2->y);
+	// vR->y = (vT1->z * vT2->x) - (vT1->x * vT2->z);
+	// vR->z = (vT1->x * vT2->y) - (vT1->y * vT2->x);
+	// return vR;
 }
 
 /**
@@ -1428,9 +1509,14 @@ HYPAPI struct vector4 *vector4_setf4(struct vector4 *self, HYP_FLOAT xT, HYP_FLO
  */
 HYPAPI struct vector4 *vector4_set(struct vector4 *self, const struct vector4 *vT)
 {
-	self->x = vT->x;
-	self->y = vT->y;
-	self->z = vT->z;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<4 ; i++){
+            (self->v[i])=(vT->v[i]);
+    }
+
+	//self->x = vT->x;
+	//self->y = vT->y;
+	//self->z = vT->z;
 	return self;
 }
 
@@ -1464,10 +1550,16 @@ HYPAPI int vector4_equals(const struct vector4 *self, const struct vector4 *vT)
  */
 HYPAPI struct vector4 *vector4_negate(struct vector4 *self)
 {
-	self->v[0] = -self->v[0];
-	self->v[1] = -self->v[1];
-	self->v[2] = -self->v[2];
-	self->v[3] = -self->v[3];
+	#pragma omp parallel for simd schedule(simd:static)
+	for (int i = 0; i <4 ; i++){
+		self->v[i] = -self->v[i];
+	}
+	
+
+	//self->v[0] = -self->v[0];
+	//self->v[1] = -self->v[1];
+	//self->v[2] = -self->v[2];
+	//self->v[3] = -self->v[3];
 	return self;
 }
 
@@ -1478,10 +1570,16 @@ HYPAPI struct vector4 *vector4_negate(struct vector4 *self)
  */
 HYPAPI struct vector4 *vector4_add(struct vector4 *self, const struct vector4 *vT)
 {
-	self->v[0] += vT->v[0];
-	self->v[1] += vT->v[1];
-	self->v[2] += vT->v[2];
-	self->v[3] += vT->v[3];
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<4 ; i++){
+            (self->v[i])+=(vT->v[i]);
+    }
+
+	//return self;
+	//self->v[0] += vT->v[0];
+	//self->v[1] += vT->v[1];
+	//self->v[2] += vT->v[2];
+	//self->v[3] += vT->v[3];
 	return self;
 }
 
@@ -1492,10 +1590,14 @@ HYPAPI struct vector4 *vector4_add(struct vector4 *self, const struct vector4 *v
  */
 HYPAPI struct vector4 *vector4_addf(struct vector4 *self, HYP_FLOAT f)
 {
-	self->v[0] += f;
-	self->v[1] += f;
-	self->v[2] += f;
-	self->v[3] += f;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i = 0; i<4 ; i++){
+		(self->v[i])+=f;
+	}
+	//self->v[0] += f;
+	//self->v[1] += f;
+	//self->v[2] += f;
+	//self->v[3] += f;
 	return self;
 }
 
@@ -1506,10 +1608,15 @@ HYPAPI struct vector4 *vector4_addf(struct vector4 *self, HYP_FLOAT f)
  */
 HYPAPI struct vector4 *vector4_subtract(struct vector4 *self, const struct vector4 *vT)
 {
-	self->v[0] -= vT->v[0];
-	self->v[1] -= vT->v[1];
-	self->v[2] -= vT->v[2];
-	self->v[3] -= vT->v[3];
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i = 0; i<4 ; i++){
+		self->v[i]-=vT->v[i];
+	}
+
+	//self->v[0] -= vT->v[0];
+	//self->v[1] -= vT->v[1];
+	//self->v[2] -= vT->v[2];
+	//self->v[3] -= vT->v[3];
 	return self;
 }
 
@@ -1520,10 +1627,14 @@ HYPAPI struct vector4 *vector4_subtract(struct vector4 *self, const struct vecto
  */
 HYPAPI struct vector4 *vector4_subtractf(struct vector4 *self, HYP_FLOAT f)
 {
-	self->x -= f;
-	self->y -= f;
-	self->z -= f;
-	self->w -= f;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i = 0; i<4 ; i++){
+		self->v[i]-=f;
+	}
+	//self->x -= f;
+	//self->y -= f;
+	//self->z -= f;
+	//self->w -= f;
 	return self;
 }
 
@@ -1534,10 +1645,15 @@ HYPAPI struct vector4 *vector4_subtractf(struct vector4 *self, HYP_FLOAT f)
  */
 HYPAPI struct vector4 *vector4_multiply(struct vector4 *self, const struct vector4 *vT)
 {
-	self->v[0] *= vT->v[0];
-	self->v[1] *= vT->v[1];
-	self->v[2] *= vT->v[2];
-	self->v[3] *= vT->v[3];
+	
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i = 0; i<4 ; i++){
+		self->v[i]*=vT->v[i];
+	}
+	//self->v[0] *= vT->v[0];
+	//self->v[1] *= vT->v[1];
+	//self->v[2] *= vT->v[2];
+	//self->v[3] *= vT->v[3];
 	return self;
 }
 
@@ -1548,10 +1664,15 @@ HYPAPI struct vector4 *vector4_multiply(struct vector4 *self, const struct vecto
  */
 HYPAPI struct vector4 *vector4_multiplyf(struct vector4 *self, HYP_FLOAT f)
 {
-	self->v[0] *= f;
-	self->v[1] *= f;
-	self->v[2] *= f;
-	self->v[3] *= f;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i = 0; i<4 ; i++){
+		(self->v[i])*=f;
+	}
+	
+	//self->v[0] *= f;
+	//self->v[1] *= f;
+	//self->v[2] *= f;
+	//self->v[3] *= f;
 	return self;
 }
 
@@ -1563,10 +1684,15 @@ HYPAPI struct vector4 *vector4_multiplyf(struct vector4 *self, HYP_FLOAT f)
  */
 HYPAPI struct vector4 *vector4_divide(struct vector4 *self, const struct vector4 *vT)
 {
-	self->v[0] /= vT->v[0];
-	self->v[1] /= vT->v[1];
-	self->v[2] /= vT->v[2];
-	self->v[3] /= vT->v[3];
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i = 0; i<4 ; i++){
+		(self->v[i])/=(vT->v[i]);
+	}
+	
+	//self->v[0] /= vT->v[0];
+	//self->v[1] /= vT->v[1];
+	//self->v[2] /= vT->v[2];
+	//self->v[3] /= vT->v[3];
 	return self;
 }
 
@@ -1577,7 +1703,14 @@ HYPAPI struct vector4 *vector4_divide(struct vector4 *self, const struct vector4
  */
 HYPAPI HYP_FLOAT vector4_magnitude(const struct vector4 *self)
 {
-	return HYP_SQRT((self->x * self->x) + (self->y * self->y) + (self->z * self->z) + (self->w * self->w));
+	double sum=0.0;
+	#pragma omp simd reduction(+:sum)
+	for (int i=0 ; i<4 ; ++i){
+            sum+=( ( (self->v[i])*(self->v[i]) ) );
+    }
+
+	return HYP_SQRT(sum);
+	//return HYP_SQRT((self->x * self->x) + (self->y * self->y) + (self->z * self->z) + (self->w * self->w));
 }
 
 
@@ -1598,10 +1731,15 @@ HYPAPI struct vector4 *vector4_normalize(struct vector4 *self)
 		return self;
 	}
 
-	self->x = self->x / mag;
-	self->y = self->y / mag;
-	self->z = self->z / mag;
-	self->w = self->w / mag;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i = 0; i<4 ; i++){
+		(self->v[i])/=mag;
+	}
+
+	//self->x = self->x / mag;
+	//self->y = self->y / mag;
+	//self->z = self->z / mag;
+	//self->w = self->w / mag;
 
 	return self;
 }
@@ -1613,7 +1751,15 @@ HYPAPI struct vector4 *vector4_normalize(struct vector4 *self)
  */
 HYPAPI HYP_FLOAT vector4_dot_product(const struct vector4 *self, const struct vector4 *vT)
 {
-	return (self->x * vT->x) + (self->y * vT->y) + (self->z * vT->z) + (self->w * vT->w);
+	HYP_FLOAT sum=0.0;
+	#pragma omp simd reduction(+:sum)
+	for (int i=0 ; i<4 ; ++i){
+            sum+=((self->v[i])*(vT->v[i]));
+    }
+
+    return sum;
+
+	//return (self->x * vT->x) + (self->y * vT->y) + (self->z * vT->z) + (self->w * vT->w);
 }
 
 
@@ -1623,10 +1769,16 @@ HYPAPI HYP_FLOAT vector4_dot_product(const struct vector4 *self, const struct ve
  */
 HYPAPI struct vector4 *vector4_cross_product(struct vector4 *vR, const struct vector4 *vT1, const struct vector4 *vT2)
 {
-	vR->x = (vT1->y * vT2->z) - (vT1->z * vT2->y);
-	vR->y = (vT1->z * vT2->x) - (vT1->x * vT2->z);
-	vR->z = (vT1->x * vT2->y) - (vT1->y * vT2->x);
-	vR->w = (vT1->w * vT2->w) - (vT1->w * vT2->w);
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<3 ; i++){
+		vR->v[i]=((vT1->v[(i+1)%3] * vT2->v[(i+2)%3]) - (vT1->v[(i+2)%3] * vT2->v[(i+1)%3]));
+	}
+	vR->v[3] = (vT1->v[3] * vT2->v[3]) - (vT1->v[3] * vT2->v[3]);
+	
+	//vR->x = (vT1->y * vT2->z) - (vT1->z * vT2->y);
+	//vR->y = (vT1->z * vT2->x) - (vT1->x * vT2->z);
+	//vR->z = (vT1->x * vT2->y) - (vT1->y * vT2->x);
+	//vR->w = (vT1->w * vT2->w) - (vT1->w * vT2->w);
 	return vR;
 }
 
@@ -1640,10 +1792,18 @@ HYPAPI struct vector4 *vector4_cross_product(struct vector4 *vR, const struct ve
  */
 HYPAPI HYP_FLOAT vector4_distance(const struct vector4 *v1, const struct vector4 *v2)
 {
-	return HYP_SQRT((v2->x - v1->x) * (v2->x - v1->x)
-		    + (v2->y - v1->y) * (v2->y - v1->y)
-		    + (v2->z - v1->z) * (v2->z - v1->z)
-		    + (v2->w - v1->w) * (v2->w - v1->w));
+	double sum=0.0;
+	#pragma omp simd reduction(+:sum)
+	for (int i=0 ; i<4 ; ++i){
+            sum+=(((v2->v[i])-(v1->v[i]))*((v2->v[i])-(v1->v[i])));
+    }
+
+	return HYP_SQRT(sum);
+
+	//return HYP_SQRT((v2->x - v1->x) * (v2->x - v1->x)
+	//	    + (v2->y - v1->y) * (v2->y - v1->y)
+	//	    + (v2->z - v1->z) * (v2->z - v1->z)
+	//	    + (v2->w - v1->w) * (v2->w - v1->w));
 }
 
 
@@ -1662,10 +1822,15 @@ HYPAPI void _vector4_print(const struct vector4 *self)
  */
 HYPAPI struct vector4 *_vector4_set_random(struct vector4 *self)
 {
-	self->x = HYP_RANDOM_FLOAT;
-	self->y = HYP_RANDOM_FLOAT;
-	self->z = HYP_RANDOM_FLOAT;
-	self->w = HYP_RANDOM_FLOAT;
+	#pragma omp parallel for simd schedule(simd:static)
+	for(int i=0 ; i<4 ; i++){
+		(self->v[i])=HYP_RANDOM_FLOAT;
+	}
+
+	//self->x = HYP_RANDOM_FLOAT;
+	//self->y = HYP_RANDOM_FLOAT;
+	//self->z = HYP_RANDOM_FLOAT;
+	//self->w = HYP_RANDOM_FLOAT;
 	return self;
 }
 
