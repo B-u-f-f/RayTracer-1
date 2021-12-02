@@ -21,6 +21,10 @@ typedef struct {
     // pointer to the material of the object
     const Material * hitObjMat;    
 
+    // texture coordinates
+    CFLOAT u;
+    CFLOAT v;
+
     // the surface of the object where ray
     // intersected the object
     bool frontFace;

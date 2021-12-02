@@ -12,7 +12,7 @@
 #include "color.h"
 
 START_TEST(check_material_lambertian){
-    LambertianMat t_lmat = {
+/*    LambertianMat t_lmat = {
         .albedo = {
             .r = 1.0,
             .g = 2.0,
@@ -104,7 +104,7 @@ START_TEST(check_material_lambertian){
     ck_assert_ld_vec3_eq(expected_ray.origin, out.origin);
     ck_assert_ld_vec3_eq(expected_ray.direction, out.direction);
     ck_assert_colorf_eq(exp_attenuation, t_lmat.albedo);
-    ck_assert_int_eq(b, 1);
+    ck_assert_int_eq(b, 1);*/
 }
 END_TEST
 
@@ -582,7 +582,7 @@ START_TEST(check_material_dielectric_refract){
 
 }END_TEST
 
-
+/*
 START_TEST(check_material_create_lambertian)
 {
     LambertianMat lm = {
@@ -602,6 +602,7 @@ START_TEST(check_material_create_lambertian)
 
 }
 END_TEST
+*/
 
 START_TEST(check_material_create_metal)
 {
@@ -660,7 +661,7 @@ Suite* util_suite(void)
     tcase_add_test(tc_core, check_material_metal_false);
     tcase_add_test(tc_core, check_material_dielectric_reflect);
     tcase_add_test(tc_core, check_material_dielectric_refract);
-    tcase_add_test(tc_core, check_material_create_lambertian);
+    //tcase_add_test(tc_core, check_material_create_lambertian);
     tcase_add_test(tc_core, check_material_create_metal);
     tcase_add_test(tc_core, check_material_create_dielectric);
 

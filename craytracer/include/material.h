@@ -6,6 +6,7 @@
 #include "hitRecord.h"
 #include "hypatiaINC.h"
 #include "color.h"
+#include "texture.h"
 
 #include <stdbool.h>
 
@@ -15,7 +16,8 @@ typedef struct metalMat {
 } MetalMat;
 
 typedef struct lambertianMat {
-    RGBColorF albedo;
+    //RGBColorF albedo;
+    Texture lambTexture;
 } LambertianMat;
 
 typedef struct dielectricMat {

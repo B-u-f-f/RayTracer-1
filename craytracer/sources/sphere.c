@@ -1,23 +1,26 @@
 #include "sphere.h"
 #include <stdalign.h>
 #include <tgmath.h>
+#include "util.h"
 
-
-static void hit(
-        const ObjectLLNode * restrict objLLn, 
+static bool hit(
+        const Object * restrict obj, 
         Ray r, 
         CFLOAT t_min, 
         CFLOAT t_max, HitRecord * outRecord )
 {
-    if(objLLn->objType == SPHERE){
-        obj_sphereHit((const Sphere *)objLLn->object, r, t_min, t_max, outRecord);
-    }else if(objLLn->objType == OBJLL){
-        obj_objLLHit((const ObjectLL *)objLLn->object, r, t_min, t_max, outRecord);
+    if(obj->objType == SPHERE){
+        return obj_sphereHit((const Sphere *)obj->object, r, t_min, t_max, outRecord);
+    }else if(obj->objType == OBJLL){
+        return obj_objLLHit((const ObjectLL *)obj->object, r, t_min, t_max, outRecord);
     }
+
+
+    return false;
 }
 
 
-void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord){
+bool obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord){
     vec3 oc = r.origin;
     vec3 direction = r.direction;
 
@@ -44,8 +47,8 @@ void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, 
 
     // If the discriminant is less than 0 then no intersection
     if(discri < 0){
-        outRecord->valid = false;
-        return;
+        // outRecord->valid = false;
+        return false;
     }
 
     // sqrtd = sqrt(discri)
@@ -62,8 +65,8 @@ void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, 
         // If neither roots correspond to an intersection point in
         // the intersection range then return invalid
         if(root < t_min || t_max < root){
-            outRecord->valid = false; 
-            return;
+            // outRecord->valid = false; 
+            return false;
         }
     }
 
@@ -88,7 +91,31 @@ void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, 
     vector3_multiplyf(&n, 1/s->radius);
     
     hr_setRecordi(t, p, n, direction, outRecord, &s->sphMat);
+    obj_sphereTexCoords(outRecord->normal, &outRecord->u, &outRecord->v);
+
+    return true;
 }
+
+void obj_sphereTexCoords(vec3 pointOnSphere,
+                         CFLOAT * outU, CFLOAT * outV){
+    CFLOAT theta = acos(-pointOnSphere.y); 
+    CFLOAT phi = atan2(-pointOnSphere.z, pointOnSphere.x) + CF_PI; 
+
+    *outU = phi / (2 * CF_PI);
+    *outV = theta / CF_PI;
+
+}
+
+Object * obj_createObject(void * restrict object, 
+                          ObjectType type, 
+                          DynamicStackAlloc * restrict dsa)
+{
+    Object * o = alloc_dynamicStackAllocAllocate(dsa, sizeof(Object), alignof(Object));
+    
+    o->object = object;
+    o->objType = type;
+    return o;
+} 
 
 bool obj_objectLLAdd(
         ObjectLL * restrict objll, 
@@ -103,8 +130,8 @@ bool obj_objectLLAdd(
     ObjectLLNode * olln = alloc_dynamicStackAllocAllocate(objll->dsa, 
                           sizeof(ObjectLLNode), alignof(ObjectLLNode)); 
     
-    olln->object = obj;
-    olln->objType = objType;
+    olln->obj.object = obj;
+    olln->obj.objType = objType;
 
     if(!objll->head){
         olln->next = NULL;
@@ -145,14 +172,15 @@ bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index){
     return true;
 }
 
-/*HitRecord**/void obj_objLLHit (const ObjectLL* restrict objll,
+/*HitRecord**/
+bool obj_objLLHit (const ObjectLL* restrict objll,
                    Ray r, 
                    CFLOAT t_min,
                    CFLOAT t_max,
                    HitRecord * out){
     
     if(!objll || !objll->valid){
-        return; //NULL;
+        return false; //NULL;
     }
 
     HitRecord * hr = (HitRecord *) alloc_linearAllocFCAllocate(objll->hrAlloc);
@@ -160,7 +188,7 @@ bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index){
 
     ObjectLLNode * cur = objll->head;
     while(cur != NULL){
-        hit(cur, r, t_min, t_max, hr);
+        hit(&cur->obj, r, t_min, t_max, hr);
         
         if(hr->valid){
             if(h == NULL ){
@@ -176,8 +204,12 @@ bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index){
         cur = cur->next;
     }
     
-    if(h != NULL)
+    if(h != NULL){
         *out = *h;  
+        return true;
+    }
+
+    return false;
     //return h;
 }
 
@@ -193,8 +225,8 @@ bool obj_objLLAddSphere(ObjectLL * restrict objll,
 }
 
 ObjectLL * obj_createObjectLL(    
-    DynamicStackAlloc * restrict dsaAlloc, 
-    DynamicStackAlloc * restrict dsaObjs
+    DynamicStackAlloc * dsaAlloc, 
+    DynamicStackAlloc * dsaObjs
 ){
     
     ObjectLL * objLL = alloc_dynamicStackAllocAllocate(dsaAlloc, sizeof(ObjectLL), alignof(ObjectLL));
@@ -206,6 +238,62 @@ ObjectLL * obj_createObjectLL(
     objLL->hrAlloc = NULL; 
 
     return objLL;
+}
+
+Object * obj_objectLLGetAT(const ObjectLL * restrict objll, size_t index){
+    if(index >= objll->numObjects){
+        return NULL; 
+    }
+
+    ObjectLLNode * cur = objll->head;
+    size_t i = 0;
+    while(i < index){
+        cur = cur->next;
+        i += 1;
+    }
+    
+    return &cur->obj;
+}
+
+
+void obj_objectLLSetAT(const ObjectLL * restrict objll, size_t index, Object object){
+    if(index >= objll->numObjects){
+        return; 
+    }
+
+    ObjectLLNode * cur = objll->head;
+    size_t i = 0;
+    while(i < index){
+        cur = cur->next;
+        i += 1;
+    }
+    
+    cur->obj = object; 
+}
+
+void obj_objectLLSort(const ObjectLL * restrict objll, 
+                      size_t start, 
+                      size_t end, ObjectComparator comp){
+
+    if(start >= end || end > objll->numObjects || start > objll->numObjects){
+        return;
+    }
+
+    size_t i = start + 1;
+
+    while(i < (end + 1)){
+        Object * key = obj_objectLLGetAT(objll, i);
+        size_t j = i - 1;
+
+        Object * aj = obj_objectLLGetAT(objll, j);
+        while(j != ((size_t)-1) && comp(aj, key)){
+            obj_objectLLSetAT(objll, j + 1, *aj); 
+            j -= 1;
+            aj = obj_objectLLGetAT(objll, j);
+        }
+        obj_objectLLSetAT(objll, j + 1, *key); 
+        i += 1;
+    }
 }
 
 bool obj_AABBHit(const AABB* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max){
@@ -262,11 +350,13 @@ static AABB surrounding_box(const AABB* restrict box0, const AABB* restrict box1
 }
 
 
-static bool boundingBox(const ObjectLLNode * restrict objLLn, AABB* outbox){
-    if(objLLn->objType == SPHERE){
-        return obj_sphereCalcBoundingBox(((const Sphere *)objLLn->object), outbox);
-    }else if(objLLn->objType == OBJLL){
-        return obj_objectLLCalcBoundingBox((const ObjectLL *)objLLn->object, outbox);
+static bool boundingBox(const Object * restrict obj, AABB* outbox){
+    if(obj->objType == SPHERE){
+        return obj_sphereCalcBoundingBox(((const Sphere *)obj->object), outbox);
+    }else if(obj->objType == OBJLL){
+        return obj_objectLLCalcBoundingBox((const ObjectLL *)obj->object, outbox);
+    }else if(obj->objType == OBJBVH){ 
+        return obj_bvhCalcBoundingBox((const BVH *)obj->object, outbox); 
     }
     
     return false;
@@ -282,7 +372,7 @@ bool obj_objectLLCalcBoundingBox(const ObjectLL* restrict objll, AABB * outbox){
 
     while(cur != NULL){
         
-        if(!boundingBox(cur, &tempBox)) return false;
+        if(!boundingBox(&cur->obj, &tempBox)) return false;
 
         
         if(firstBox){
@@ -298,3 +388,106 @@ bool obj_objectLLCalcBoundingBox(const ObjectLL* restrict objll, AABB * outbox){
     return true;
 }
 
+
+bool obj_bvhCalcBoundingBox(const BVH * restrict bvh, AABB * restrict outbox){
+    *outbox = bvh->box;
+    return true;
+}
+
+bool obj_bvhHit(const BVH* restrict bvh, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * out){
+    if(!obj_AABBHit(&bvh->box, r, t_min, t_max)){
+        return false;
+    }
+
+    HitRecord rec;
+    rec.valid = false;
+
+    bool hitLeft = hit(bvh->left, r, t_min, t_max, &rec);
+    bool hitRight = hit(bvh->right, r, t_min, hitLeft ? rec.distanceFromOrigin : t_max, &rec);
+
+    *out = rec;
+    
+    return hitLeft || hitRight;
+}
+
+static bool boxCompare(const Object * obj1, const Object * obj2, int axis){
+    AABB a;
+    AABB b;
+
+    if(!boundingBox(obj1, &a) || !boundingBox(obj2, &b)){
+        printf("wtf \n");  
+    }
+
+    return a.minimum.v[axis] < b.minimum.v[axis];
+}
+
+static bool boxXCompare(const Object * obj1, const Object * obj2){
+    return boxCompare(obj1, obj2, 0);
+} 
+
+static bool boxYCompare(const Object * obj1, const Object * obj2){
+    return boxCompare(obj1, obj2, 1);
+}
+
+static bool boxZCompare(const Object * obj1, const Object * obj2){
+    return boxCompare(obj1, obj2, 2);
+}
+
+void obj_fillBVH(BVH * restrict bvh, 
+                   const ObjectLL * restrict objects,
+                   size_t start, size_t end){
+    
+    uint32_t axis = util_randomRange(0, 2); 
+    size_t objectSpan = end - start;
+
+    ObjectComparator comp = NULL;
+
+    if(axis == 0) { comp = boxXCompare; }
+    else if(axis == 1){ comp = boxYCompare; }
+    else { comp = boxZCompare; }
+
+    if(objectSpan == 1){
+        bvh->left = bvh->right = obj_objectLLGetAT(objects, start); 
+    }else if(objectSpan == 2){
+        Object * o = obj_objectLLGetAT(objects, start);
+        Object * o2 = obj_objectLLGetAT(objects, start + 1); 
+
+        if(comp(o, o2)){
+            bvh->left = o;
+            bvh->right = o2;
+        }else{
+            bvh->left = o2;
+            bvh->right = o; 
+        }
+    }else {
+        obj_objectLLSort(objects, start, end, comp); 
+
+        size_t mid = start + objectSpan / 2;
+        BVH * left  = obj_createBVH(bvh->dsa, bvh->dsa); 
+        BVH * right = obj_createBVH(bvh->dsa, bvh->dsa); 
+
+        obj_fillBVH(left, objects, start, mid);
+        obj_fillBVH(right, objects, mid, end);
+
+        bvh->left  = obj_createObject(left, OBJBVH, bvh->dsa);
+        bvh->right = obj_createObject(right, OBJBVH, bvh->dsa);
+    }
+
+    AABB leftBox, rightBox;
+        
+    if(!boundingBox(bvh->left, &leftBox) || !boundingBox(bvh->right, &rightBox)){
+        printf("wtf2 \n");
+    }
+    
+    bvh->box = surrounding_box(&leftBox, &rightBox);
+}
+
+
+BVH * obj_createBVH(DynamicStackAlloc * alloc, DynamicStackAlloc * dsa){
+    BVH * bvh = alloc_dynamicStackAllocAllocate(alloc, sizeof(BVH), alignof(BVH));
+    
+    bvh->right = bvh->left = NULL;
+    bvh->dsa = dsa;
+
+    return bvh;
+}

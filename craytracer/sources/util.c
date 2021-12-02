@@ -41,11 +41,11 @@ uint8_t util_uint8Clamp(uint8_t c, uint8_t lower, uint8_t upper){
     return c;
 }
 
-/*
-int randomRange(int lower, int upper){
+
+uint32_t util_randomRange(uint32_t lower, uint32_t upper){
     return (rand() % (upper - lower + 1)) + lower;
 }
-*/
+
 
 vec3 util_randomUnitSphere(){
     CFLOAT x, y, z;

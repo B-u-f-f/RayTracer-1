@@ -87,7 +87,7 @@ static bool mat_lambScatter(const LambertianMat * restrict nlambMat,
 
     *out = ray_create(rec->point,scatter_direction);
 
-    *attenuation = nlambMat->albedo;
+    *attenuation = tex_value(&nlambMat->lambTexture, rec->u, rec->v, rec->point); 
 
     return true;
 }

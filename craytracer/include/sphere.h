@@ -2,6 +2,7 @@
 #define SPHERE_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "hypatiaINC.h"
 #include "hitRecord.h"
@@ -10,6 +11,8 @@
 #include "ray.h"
 #include "material.h"
 #include "allocator.h"
+
+typedef struct aabb AABB;
 
 typedef struct {
     // center of the sphere
@@ -22,31 +25,35 @@ typedef struct {
     CFLOAT radius;
 } Sphere;
 
-typedef struct {
-    vec3 maximum;
-    vec3 minimum;
-} AABB;
 
-
-extern void obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord);
+extern bool obj_sphereHit(const Sphere* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * outRecord);
 extern bool obj_sphereCalcBoundingBox(const Sphere* restrict s, AABB * outbox);
+extern void obj_sphereTexCoords(vec3 pointOnSphere, CFLOAT * outU, CFLOAT * outV);
 
 // enum contaning different types of objects
 typedef enum {
     SPHERE,
     OBJLL,
-    BVHNODE
+    OBJBVH
 } ObjectType;
 
-// node of the linked list 
-typedef struct objectLLNode ObjectLLNode;
-typedef struct objectLLNode{
+typedef struct {
     // ptr to the object stored in this node
     void * restrict object;
 
     // type of the object 
     ObjectType objType;
-    
+} Object;
+
+
+extern Object * obj_createObject(void * restrict object, ObjectType type, 
+                                 DynamicStackAlloc * restrict dsa );
+
+// node of the linked list 
+typedef struct objectLLNode ObjectLLNode;
+typedef struct objectLLNode{
+    Object obj;
+
     // points to the next node
     ObjectLLNode * restrict next;
 } ObjectLLNode;
@@ -72,8 +79,8 @@ typedef struct objectLL {
 
 // create and setup an object linked list and return a pointer to it
 extern ObjectLL * obj_createObjectLL(
-    DynamicStackAlloc * restrict dsaAlloc, 
-    DynamicStackAlloc * restrict dsaObjs
+    DynamicStackAlloc * dsaAlloc, 
+    DynamicStackAlloc * dsaObjs
 );
 
 // function to add an object to the linked list
@@ -92,9 +99,18 @@ extern bool obj_objLLAddSphere(ObjectLL * restrict objll,
 // remove an object at any index
 extern bool obj_objectLLRemove(ObjectLL * restrict objll, size_t index); 
 
+extern Object * obj_objectLLGetAT(const ObjectLL * restrict objll, size_t index);
+extern void obj_objectLLSetAT(const ObjectLL * restrict objll, size_t index, Object object);
+
+typedef bool (*ObjectComparator)(const Object * obj1, const Object * obj2);
+extern void obj_objectLLSort(const ObjectLL * restrict objll, 
+                             size_t start, 
+                             size_t end, 
+                             ObjectComparator comp);
+
 // returns a hit record if any object in the list is intersected by the given ray
 // under the given conditions
-extern /*HitRecord**/void obj_objLLHit (const ObjectLL* restrict objll, 
+extern /*HitRecord**/bool obj_objLLHit (const ObjectLL* restrict objll, 
                           Ray r, 
                           CFLOAT t_min, 
                           CFLOAT t_max,
@@ -102,22 +118,30 @@ extern /*HitRecord**/void obj_objLLHit (const ObjectLL* restrict objll,
 
 extern bool obj_objectLLCalcBoundingBox(const ObjectLL * restrict objll, AABB* restrict outbox);
 
-
-
+typedef struct aabb {
+    vec3 maximum;
+    vec3 minimum;
+} AABB;
 
 extern bool obj_AABBHit(const AABB* restrict s, Ray r, CFLOAT t_min, CFLOAT t_max);
 
-/*
-typedef struct {
-
-} BVH;
 
 typedef struct {
-
-    
     AABB box;
 
-} BVHNode;
-*/
+    DynamicStackAlloc * restrict dsa;
+
+    Object * restrict right;
+    Object * restrict left;
+} BVH;
+
+extern BVH * obj_createBVH(DynamicStackAlloc * alloc, DynamicStackAlloc * dsa);
+
+extern void obj_fillBVH(BVH * restrict bvh, 
+                          const ObjectLL * restrict objects,
+                          size_t start, size_t end); 
+extern bool obj_bvhCalcBoundingBox(const BVH * restrict bvh, AABB * restrict outbox);
+extern bool obj_bvhHit(const BVH* restrict bvh, Ray r, CFLOAT t_min, CFLOAT t_max, HitRecord * out); 
+
 #endif
 

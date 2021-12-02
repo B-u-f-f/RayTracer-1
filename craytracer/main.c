@@ -1,4 +1,5 @@
 #define HYPATIA_IMPLEMENTATION
+//#define STB_IMAGE_IMPLEMENTATION
 
 #include <stdio.h>
 #include <assert.h>
@@ -19,6 +20,7 @@
 #include "material.h"
 #include "color.h"
 #include "allocator.h"
+#include "texture.h"
 
 RGBColorU8 writeColor(CFLOAT r, CFLOAT g, CFLOAT b, int sample_per_pixel){
     CFLOAT scale = 1.0/sample_per_pixel;
@@ -61,8 +63,8 @@ RGBColorF ray_c(Ray r, const ObjectLL * world, int depth){
     
     HitRecord rec;
     rec.valid = false;
-    /*HitRecord *  rec =*/ obj_objLLHit(world, r, 0.00001, FLT_MAX, &rec);
-    if(rec.valid){
+    /*HitRecord *  rec =*/bool checkHit = obj_objLLHit(world, r, 0.00001, FLT_MAX, &rec);
+    if(checkHit){
         Ray scattered = {0};
         RGBColorF attenuation = {0};
         
@@ -119,9 +121,30 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
     LambertianMat* materialGround = alloc_dynamicStackAllocAllocate(dsa, 
                                     sizeof(LambertianMat), 
                                     alignof(LambertianMat));
-    materialGround->albedo.r = 0.5;
+    SolidColor * sc1 = alloc_dynamicStackAllocAllocate(dsa,
+                      sizeof(SolidColor), alignof(SolidColor));
+    
+    SolidColor * sc = alloc_dynamicStackAllocAllocate(dsa,
+                      sizeof(SolidColor), alignof(SolidColor));
+
+    Checker * c = alloc_dynamicStackAllocAllocate(dsa, sizeof(Checker), alignof(Checker));
+
+    sc1->color = (RGBColorF) {.r = 0.2, .b = 0.3, .g = 0.1};
+    sc->color = (RGBColorF){.r = 0.9, .b = 0.9, .g = 0.9};
+
+    c->even.tex = sc1;
+    c->even.texType = SOLID_COLOR;
+    c->odd.tex = sc;
+    c->odd.texType = SOLID_COLOR;
+
+
+
+    materialGround->lambTexture.tex = c;
+    materialGround->lambTexture.texType = CHECKER;
+
+    /*materialGround->albedo.r = 0.5;
     materialGround->albedo.g = 0.5;
-    materialGround->albedo.b = 0.5;
+    materialGround->albedo.b = 0.5;*/
 
     obj_objLLAddSphere(world, (Sphere){
         .center = {.x = 0, .y = -1000, .z = 0}, .radius = 1000, .sphMat = MAT_CREATE_LAMB_IP(materialGround) 
@@ -152,8 +175,15 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
                     LambertianMat* lambMat = alloc_dynamicStackAllocAllocate(dsa, 
                                             sizeof(LambertianMat), 
                                             alignof(LambertianMat));
+                    
+                    SolidColor * sc = alloc_dynamicStackAllocAllocate(dsa,
+                                      sizeof(SolidColor), alignof(SolidColor));
 
-                    lambMat->albedo = albedo;
+                    sc->color = albedo;
+
+                    lambMat->lambTexture.tex = sc;
+                    lambMat->lambTexture.texType = SOLID_COLOR;
+
                     obj_objLLAddSphere(world, (Sphere) {
                         .center = center,
                         .radius = 0.2,
@@ -214,10 +244,19 @@ void randomSpheres(ObjectLL * world, DynamicStackAlloc * dsa){
     
     LambertianMat* material2 = alloc_dynamicStackAllocAllocate(dsa, 
                                            sizeof(LambertianMat), 
-                                           alignof(LambertianMat));    
-    material2->albedo.r = 0.4;
+                                           alignof(LambertianMat));
+
+    sc = alloc_dynamicStackAllocAllocate(dsa,
+                      sizeof(SolidColor), alignof(SolidColor));
+    
+    
+    sc->color = (RGBColorF) { .r = 0.4, .g = 0.2, .b = 0.1 };
+    material2->lambTexture.tex = sc;
+    material2->lambTexture.texType = SOLID_COLOR;
+    /*material2->albedo.r = 0.4;
     material2->albedo.g = 0.2;
     material2->albedo.b = 0.1;
+    */
 
     obj_objLLAddSphere(world, (Sphere){
         .center = {.x = -4, .y = 1, .z = 0},
@@ -278,11 +317,39 @@ int main(int argc, char *argv[]){
     RGBColorU8* image = (RGBColorU8*) malloc(sizeof(RGBColorF) * HEIGHT * WIDTH);
 
     DynamicStackAlloc * dsa = alloc_createDynamicStackAllocD(1024, 100);
-    DynamicStackAlloc * dsaO = alloc_createDynamicStackAllocD(1024, 10);
+    // DynamicStackAlloc * dsa1 = alloc_createDynamicStackAllocD(1024, 100);
+    DynamicStackAlloc * dsa0 = alloc_createDynamicStackAllocD(1024, 10);
     
-    ObjectLL * world = obj_createObjectLL(dsaO, dsa);
+    ObjectLL * world = obj_createObjectLL(dsa0, dsa);
 
-    randomSpheres(world, dsa);
+    // randomSpheres(world, dsa);
+    
+    const char * file = "/home/lenovo/VTOP/pdc/project/pdc_project/testtextures/img2.png";
+
+    Image img = {0};
+    tex_loadImage(&img, file);
+
+    Texture t = {
+        .tex = &img,
+        .texType = IMAGE
+    };
+
+
+    LambertianMat* matgnd = alloc_dynamicStackAllocAllocate(dsa, 
+                                    sizeof(LambertianMat), 
+                                    alignof(LambertianMat));
+
+    matgnd->lambTexture = t;
+
+    obj_objLLAddSphere(world, (Sphere){
+        .center = {.x = 0, .y = 0, .z = 0}, .radius = 2, .sphMat = MAT_CREATE_LAMB_IP(matgnd) 
+    });
+
+
+
+    // BVH * bvh = obj_createBVH(dsa0, dsa1);
+    // obj_fillBVH(bvh, world, 0, world->numObjects - 1);
+
     LinearAllocFC * lafc = alloc_createLinearAllocFC(MAX_DEPTH * world->numObjects, sizeof(HitRecord), alignof(HitRecord));
     world->hrAlloc = lafc;
 
@@ -318,6 +385,8 @@ int main(int argc, char *argv[]){
     
     alloc_freeLinearAllocFC(lafc);
     alloc_freeDynamicStackAllocD(dsa);
-    alloc_freeDynamicStackAllocD(dsaO);
+    alloc_freeDynamicStackAllocD(dsa0);
+    //alloc_freeDynamicStackAllocD(dsa1);
+    
     return 0;
 }

@@ -11,7 +11,7 @@ extern CFLOAT util_floatClamp(CFLOAT c, CFLOAT lower, CFLOAT upper);
 extern uint8_t util_uint8Clamp(uint8_t c, uint8_t lower, uint8_t upper);
 
 // not in use
-// int randomRange(int lower, int upper);
+extern uint32_t util_randomRange(uint32_t lower, uint32_t upper);
 
 
 extern vec3 util_randomUnitSphere();
